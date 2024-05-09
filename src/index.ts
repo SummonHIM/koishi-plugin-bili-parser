@@ -1,6 +1,7 @@
 import { Context, Schema } from "koishi";
 import { link_type_parser } from "./link_parse";
-import { bili_video } from "./bili_video";
+import { Bili_Video } from "./bili_video";
+import { Bili_Live } from "./bili_live";
 
 export const name = "bili-parser";
 
@@ -21,17 +22,19 @@ export function apply(ctx: Context) {
       if (moreLink !== false) ret += "\n";
       switch (element["type"]) {
         case "Video":
-          const video = new bili_video(ctx);
-          const info = await video.gen_context(element["id"]);
-          ret += info;
-          break;
-
-        case "Space":
-          ret += element["id"] + "\n";
+          const bili_video = new Bili_Video(ctx);
+          const video_info = await bili_video.gen_context(element["id"]);
+          ret += video_info;
           break;
 
         case "Live":
-          ret += element["id"] + "\n";
+          const bili_live = new Bili_Live(ctx);
+          const live_info = await bili_live.gen_context(element["id"]);
+          ret += live_info;
+          break;
+
+        case "Space":
+          ret += "暂时不支持查询空间信息，敬请期待！" + "\n";
           break;
 
         case "Short":

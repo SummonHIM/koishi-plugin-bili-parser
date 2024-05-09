@@ -1,7 +1,7 @@
 import { Context } from "koishi";
 import { vid_type_parse } from "./link_parse";
 
-export class bili_video {
+export class Bili_Video {
   private ctx: Context;
 
   constructor(ctx: Context) {
@@ -11,7 +11,7 @@ export class bili_video {
   /**
    * 根据视频 ID 查找视频信息
    * @param id 视频 ID
-   * @returns 视频信息
+   * @returns 视频信息 Json
    */
   async fetch_video_info(id: string) {
     var ret: string[];
@@ -37,7 +37,7 @@ export class bili_video {
   /**
    * 生成视频信息
    * @param id 视频 ID
-   * @returns 视频信息
+   * @returns 文字视频信息
    */
   async gen_context(id: string) {
     const info = await this.fetch_video_info(id);
