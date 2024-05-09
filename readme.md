@@ -33,3 +33,8 @@ When regex match `live\.bilibili\.com(?:\/h5)?\/(\d+)`, reply
 观看：${online}	关注：${attention}
 https://live.bilibili.com/${id}
 ```
+
+### Short link/短链接
+When regex match `b23\.tv\/([0-9a-zA-Z]+)`, `bili(?:22|23|33)\.cn\/([0-9a-zA-Z]+)`, reply
+
+当正则表达式符合 `b23\.tv\/([0-9a-zA-Z]+)`，`bili(?:22|23|33)\.cn\/([0-9a-zA-Z]+)`，会先解析回原链接，之后会自动交给以上方法处理。
