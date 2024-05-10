@@ -35,7 +35,10 @@ export function apply(ctx: Context, config: Config) {
         break;
       }
 
-      ret += await type_processer(ctx, config, element);
+      const tp_ret = await type_processer(ctx, config, element);
+      if (tp_ret == null) ret += "无法解析链接信息。"
+      else ret += tp_ret
+
       countLink++;
     }
 

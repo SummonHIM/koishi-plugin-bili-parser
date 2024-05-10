@@ -1,14 +1,46 @@
 import { Context } from "koishi";
-import { vid_type_parse } from "./link_parse";
 import { Config } from ".";
 
 export class Bili_Video {
   private ctx: Context;
-  private config: Config
+  private config: Config;
 
   constructor(ctx: Context, config: Config) {
     this.ctx = ctx;
-    this.config = config
+    this.config = config;
+  }
+
+  /**
+   * 解析 ID 类型
+   * @param id 视频 ID
+   * @returns type: ID 类型, id: 视频 ID
+   */
+  private vid_type_parse(id: string) {
+    var idRegex = [
+      {
+        pattern: /av([0-9]+)/i,
+        type: "av",
+      },
+      {
+        pattern: /bv([0-9a-zA-Z]+)/i,
+        type: "bv",
+      },
+    ];
+
+    for (const rule of idRegex) {
+      var match = id.match(rule.pattern);
+      if (match) {
+        return {
+          type: rule.type,
+          id: match[1],
+        };
+      }
+    }
+
+    return {
+      type: null,
+      id: null,
+    };
   }
 
   /**
@@ -18,7 +50,7 @@ export class Bili_Video {
    */
   async fetch_video_info(id: string) {
     var ret: string[];
-    const vid = vid_type_parse(id);
+    const vid = this.vid_type_parse(id);
     switch (vid["type"]) {
       case "av":
         ret = await this.ctx.http.get(
