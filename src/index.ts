@@ -36,7 +36,7 @@ export function apply(ctx: Context, config: Config) {
       }
 
       const tp_ret = await type_processer(ctx, config, element);
-      if (tp_ret == null) ret += "无法解析链接信息。"
+      if (tp_ret == null) ret += "[BP] 无法解析链接信息。该类型可能暂不支持。"
       else ret += tp_ret
 
       countLink++;

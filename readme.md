@@ -34,6 +34,20 @@ When regex match `live\.bilibili\.com(?:\/h5)?\/(\d+)`, reply
 https://live.bilibili.com/${id}
 ```
 
+### Live/直播
+When regex match `bilibili\.com\/bangumi\/play\/((ep|ss)(\d+))`, `bilibili\.com\/bangumi\/media\/(md(\d+))`, reply
+
+当正则表达式符合 `bilibili\.com\/bangumi\/play\/((ep|ss)(\d+))`，`bilibili\.com\/bangumi\/media\/(md(\d+))`，回复
+
+```
+标题
+![图片](图片链接)
+介绍
+点赞：${likes}	投币：${coins}
+收藏：${favs}	转发：${stat}
+https://www.bilibili.com/video/${id}
+```
+
 ### Short link/短链接
 When regex match `b23\.tv\/([0-9a-zA-Z]+)`, `bili(?:22|23|33)\.cn\/([0-9a-zA-Z]+)`, reply
 
