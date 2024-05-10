@@ -1,4 +1,4 @@
-import { Context, Schema } from "koishi";
+import { Context, Schema, h } from "koishi";
 import { link_type_parser, type_processer } from "./link_parse";
 
 export const name = "bili-parser";
@@ -24,6 +24,7 @@ export function apply(ctx: Context, config: Config) {
     if (links.length === 0) return next();
 
     var ret: string = "";
+    ret += [h("quote", { id: session.messageId })];
     let countLink = 0;
 
     // 循环检测链接类型

@@ -49,8 +49,8 @@ export class Bili_Video {
     var ret = info["data"]["title"] + "\n";
     ret += `<img src=\"${info["data"]["pic"]}\"/>`;
     ret += info["data"]["desc"] + "\n";
-    ret += `点赞：${info["data"]["stat"]["like"]}\t投币：${info["data"]["stat"]["coin"]}\n`;
-    ret += `收藏：${info["data"]["stat"]["favorite"]}\t转发：${info["data"]["stat"]["share"]}\n`;
+    ret += `点赞：${info["data"]["stat"]["like"]}\t\t投币：${info["data"]["stat"]["coin"]}\n`;
+    ret += `收藏：${info["data"]["stat"]["favorite"]}\t\t转发：${info["data"]["stat"]["share"]}\n`;
     if (this.config.idPreference == "bv")
       ret += "https://www.bilibili.com/video/" + info["data"]["bvid"] + "\n";
     else if (this.config.idPreference == "av")

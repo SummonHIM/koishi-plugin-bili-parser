@@ -20,6 +20,10 @@ export function link_type_parser(content: string): string[] {
       type: "Short",
     },
     {
+      pattern: /https:\\\/\\\/b23.tv\\\/(.+)\?/gim, // 小程序
+      type: "Short",
+    },
+    {
       pattern: /bili(?:22|23|33)\.cn\/([0-9a-zA-Z]+)/gim,
       type: "Short",
     },
@@ -113,7 +117,9 @@ export async function type_processer(
 
     case "Short":
       const bili_short = new Bili_Short(ctx);
-      const typed_link = link_type_parser(await bili_short.get_redir_url(element["id"]));
+      const typed_link = link_type_parser(
+        await bili_short.get_redir_url(element["id"])
+      );
       for (const element of typed_link) {
         const final_info = await type_processer(ctx, config, element);
         ret += final_info;

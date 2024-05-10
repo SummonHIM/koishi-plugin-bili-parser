@@ -49,7 +49,7 @@ export class Bili_Live {
     var ret = `[${this.getStatusText(info["data"]["live_status"])}] ${info["data"]["title"]}\n`;
     ret += `<img src=\"${info["data"]["keyframe"]}\" />`;
     ret += info["data"]["description"] + "\n";
-    ret += `观看：${info["data"]["online"]}\t关注：${info["data"]["attention"]}\n`;
+    ret += `观看：${info["data"]["online"]}\t\t关注：${info["data"]["attention"]}\n`;
     ret += `https://live.bilibili.com/${info["data"]["room_id"]}`;
     return ret;
   }
