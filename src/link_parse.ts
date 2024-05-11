@@ -6,6 +6,7 @@ import { Bili_Short } from "./bili_short";
 import { Bili_Bangumi } from "./bili_bangumi";
 import { Bili_Article } from "./bili_article";
 import { Bili_Audio } from "./bili_audio";
+import { Bili_Opus } from "./bili_opus";
 
 /**
  * 链接类型解析
@@ -41,6 +42,10 @@ export function link_type_parser(content: string): string[] {
     {
       pattern: /bilibili\.com\/audio\/au(\d+)/gim,
       type: "Audio",
+    },
+    {
+      pattern: /bilibili\.com\/opus\/(\d+)/gim,
+      type: "Opus",
     },
     // {
     //   pattern: /space\.bilibili\.com\/(\d+)/gim,
@@ -109,15 +114,21 @@ export async function type_processer(
       break;
 
     case "Article":
-      const bili_article = new Bili_Article(ctx, config)
-      const article_info = await bili_article.gen_context(element["id"])
+      const bili_article = new Bili_Article(ctx, config);
+      const article_info = await bili_article.gen_context(element["id"]);
       if (article_info != null) ret += article_info;
       break;
 
     case "Audio":
-      const bili_audio = new Bili_Audio(ctx, config)
-      const audio_info = await bili_audio.gen_context(element["id"])
+      const bili_audio = new Bili_Audio(ctx, config);
+      const audio_info = await bili_audio.gen_context(element["id"]);
       if (audio_info != null) ret += audio_info;
+      break;
+
+    case "Opus":
+      const bili_opus = new Bili_Opus(ctx, config);
+      const opus_info = await bili_opus.gen_context(element["id"]);
+      if (opus_info != null) ret += opus_info;
       break;
 
     // case "Space":

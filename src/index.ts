@@ -27,6 +27,8 @@ export interface Config {
   bMusicImage: boolean;
   bMusicAuthor: boolean;
   bMusicStat: boolean;
+  bOpusImage: boolean;
+  bOpusStat: boolean;
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -89,6 +91,11 @@ export const Config: Schema<Config> = Schema.intersect([
     bMusicAuthor: Schema.boolean().default(true).description("显示作者"),
     bMusicStat: Schema.boolean().default(true).description("显示状态"),
   }).description("音乐设置"),
+
+  Schema.object({
+    bOpusImage: Schema.boolean().default(true).description("显示图片"),
+    bOpusStat: Schema.boolean().default(true).description("显示状态"),
+  }).description("动态设置"),
 ]);
 
 export function apply(ctx: Context, config: Config) {
