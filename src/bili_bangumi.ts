@@ -128,6 +128,9 @@ export class Bili_Bangumi {
           ? (ret += `点赞：${info["result"]["stat"]["likes"]}\t\t投币：${info["result"]["stat"]["coins"]}
 收藏：${info["result"]["stat"]["favorites"]}\t\t转发：${info["result"]["stat"]["share"]}\n`)
           : null;
+        this.config.bBangumiExtraStat
+          ? (ret += `播放：${info["result"]["stat"]["views"]} 追番：${info["result"]["stat"]["favorites"]} 弹幕：${info["result"]["stat"]["danmakus"]}\n`)
+          : null;
         ret += `https://www.bilibili.com/bangumi/play/ep${episodes[epIndex]["ep_id"]}\n`;
         break;
 

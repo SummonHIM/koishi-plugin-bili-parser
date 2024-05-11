@@ -19,6 +19,7 @@ export interface Config {
   bBangumiImage: boolean;
   bBangumiEvaluate: boolean;
   bBangumiStat: boolean;
+  bBangumiExtraStat: boolean;
   bArticleImage: boolean;
   bArticleAuthor: boolean;
   bArticleStat: boolean;
@@ -70,6 +71,7 @@ export const Config: Schema<Config> = Schema.intersect([
     bBangumiImage: Schema.boolean().default(true).description("显示封面"),
     bBangumiEvaluate: Schema.boolean().default(true).description("显示简介"),
     bBangumiStat: Schema.boolean().default(true).description("显示状态"),
+    bBangumiExtraStat: Schema.boolean().default(true).description("显示状态"),
   }).description("番剧设置"),
 
   Schema.object({
