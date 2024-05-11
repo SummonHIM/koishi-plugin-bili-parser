@@ -12,9 +12,9 @@ export class Bili_Article {
   }
 
   /**
-   * 根据直播 ID 查找直播信息
-   * @param id 直播 ID
-   * @returns 直播信息 Json
+   * 根据专栏 ID 查找专栏信息
+   * @param id 专栏 ID
+   * @returns 专栏信息 Json
    */
   async fetch_article_info(id: string) {
     var ret = await this.ctx.http.get(
@@ -29,9 +29,9 @@ export class Bili_Article {
   }
 
   /**
-   * 生成直播信息
-   * @param id 直播 ID
-   * @returns 文字直播信息
+   * 生成专栏信息
+   * @param id 专栏 ID
+   * @returns 文字专栏信息
    */
   async gen_context(id: string) {
     const info = await this.fetch_article_info(id);

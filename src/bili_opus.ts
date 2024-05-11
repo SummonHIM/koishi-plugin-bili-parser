@@ -12,9 +12,9 @@ export class Bili_Opus {
   }
 
   /**
-   * 根据直播 ID 查找直播信息
-   * @param id 直播 ID
-   * @returns 直播信息 Json
+   * 根据动态 ID 查找动态信息
+   * @param id 动态 ID
+   * @returns 动态信息 Json
    */
   async fetch_article_info(id: string) {
     var ret = await this.ctx.http.get(
@@ -29,9 +29,9 @@ export class Bili_Opus {
   }
 
   /**
-   * 生成直播信息
-   * @param id 直播 ID
-   * @returns 文字直播信息
+   * 生成动态信息
+   * @param id 动态 ID
+   * @returns 文字动态信息
    */
   async gen_context(id: string) {
     const info = await this.fetch_article_info(id);

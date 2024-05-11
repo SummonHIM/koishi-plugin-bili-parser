@@ -12,9 +12,9 @@ export class Bili_Audio {
   }
 
   /**
-   * 根据直播 ID 查找直播信息
-   * @param id 直播 ID
-   * @returns 直播信息 Json
+   * 根据音乐 ID 查找音乐信息
+   * @param id 音乐 ID
+   * @returns 音乐信息 Json
    */
   async fetch_audio_info(id: string) {
     var ret = await this.ctx.http.get(
@@ -29,9 +29,9 @@ export class Bili_Audio {
   }
 
   /**
-   * 生成直播信息
-   * @param id 直播 ID
-   * @returns 文字直播信息
+   * 生成音乐信息
+   * @param id 音乐 ID
+   * @returns 文字音乐信息
    */
   async gen_context(id: string) {
     const info = await this.fetch_audio_info(id);
