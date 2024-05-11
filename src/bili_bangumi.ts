@@ -125,7 +125,7 @@ export class Bili_Bangumi {
           : null;
         ret += `第 ${episodes[epIndex]["title"]} 话 - ${episodes[epIndex]["long_title"]}\n`;
         this.config.bBangumiStat
-          ? (ret += `点赞：${info["result"]["stat"]["likes"]}\t\t投币：${info["result"]["stat"]["coins"]}\n
+          ? (ret += `点赞：${info["result"]["stat"]["likes"]}\t\t投币：${info["result"]["stat"]["coins"]}
 收藏：${info["result"]["stat"]["favorites"]}\t\t转发：${info["result"]["stat"]["share"]}\n`)
           : null;
         ret += `https://www.bilibili.com/bangumi/play/ep${episodes[epIndex]["ep_id"]}\n`;

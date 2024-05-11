@@ -42,7 +42,7 @@ export class Bili_Article {
       : null;
 
     this.config.bArticleAuthor
-      ? (ret += `作者：${info["data"]["author_name"]}\n`)
+      ? (ret += `UP主：${info["data"]["author_name"]}\n`)
       : null;
 
     this.config.bArticleStat

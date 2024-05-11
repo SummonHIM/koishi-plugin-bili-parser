@@ -9,8 +9,10 @@ export interface Config {
   userAgent: string;
   bVideoIDPreference: string;
   bVideoImage: boolean;
+  bVideoOwner: boolean;
   bVideoDesc: boolean;
   bVideoStat: boolean;
+  bVideoExtraStat: boolean;
   bLiveImage: boolean;
   bLiveDesc: boolean;
   bLiveStat: boolean;
@@ -46,10 +48,14 @@ export const Config: Schema<Config> = Schema.intersect([
       .default("bv")
       .description("ID 偏好"),
     bVideoImage: Schema.boolean().default(true).description("显示封面"),
+    bVideoOwner: Schema.boolean().default(true).description("显示 UP 主"),
     bVideoDesc: Schema.boolean().default(true).description("显示简介"),
     bVideoStat: Schema.boolean()
       .default(true)
       .description("显示状态（*三联信息*）"),
+    bVideoExtraStat: Schema.boolean()
+      .default(true)
+      .description("显示额外状态（*弹幕&观看*）"),
   }).description("视频设置"),
 
   Schema.object({

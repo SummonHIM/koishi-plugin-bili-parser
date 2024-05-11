@@ -94,11 +94,18 @@ export class Bili_Video {
       ? (ret += `<img src=\"${info["data"]["pic"]}\"/>\n`)
       : null;
 
+    this.config.bVideoOwner
+      ? (ret += `UP主： ${info["data"]["owner"]["name"]}\n`)
+      : null;
+
     this.config.bVideoDesc ? (ret += `${info["data"]["desc"]}\n`) : null;
 
     this.config.bVideoStat
       ? (ret += `点赞：${info["data"]["stat"]["like"]}\t\t投币：${info["data"]["stat"]["coin"]}
 收藏：${info["data"]["stat"]["favorite"]}\t\t转发：${info["data"]["stat"]["share"]}\n`)
+      : null;
+    this.config.bVideoExtraStat
+      ? (ret += `观看：${info["data"]["stat"]["view"]}\t\t弹幕：${info["data"]["stat"]["danmaku"]}\n`)
       : null;
 
     switch (this.config.bVideoIDPreference) {
