@@ -19,6 +19,9 @@ export interface Config {
   bArticleImage: boolean;
   bArticleAuthor: boolean;
   bArticleStat: boolean;
+  bMusicImage: boolean;
+  bMusicAuthor: boolean;
+  bMusicStat: boolean;
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -62,6 +65,12 @@ export const Config: Schema<Config> = Schema.intersect([
     bArticleAuthor: Schema.boolean().default(true).description("显示作者"),
     bArticleStat: Schema.boolean().default(true).description("显示状态"),
   }).description("专栏设置"),
+
+  Schema.object({
+    bMusicImage: Schema.boolean().default(true).description("显示封面"),
+    bMusicAuthor: Schema.boolean().default(true).description("显示作者"),
+    bMusicStat: Schema.boolean().default(true).description("显示状态"),
+  }).description("音乐设置"),
 ]);
 
 export function apply(ctx: Context, config: Config) {
