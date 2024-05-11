@@ -48,6 +48,20 @@ When regex match `bilibili\.com\/bangumi\/play\/((ep|ss)(\d+))`, `bilibili\.com\
 https://www.bilibili.com/video/${id}
 ```
 
+### 专栏
+When regex match `bilibili\.com\/read\/cv(\d+)`, `bilibili\.com\/read\/mobile(?:\?id=|\/)(\d+)`, reply
+
+当正则表达式符合 `bilibili\.com\/read\/cv(\d+)`，`bilibili\.com\/read\/mobile(?:\?id=|\/)(\d+)`，回复
+
+```
+标题
+![图片](图片链接)
+作者：作者名称
+点赞：${like}	投币：${coin}
+收藏：${fav}	转发：${stat}
+https://www.bilibili.com/read/cv${id}
+```
+
 ### Short link/短链接
 When regex match `b23\.tv\/([0-9a-zA-Z]+)`, `bili(?:22|23|33)\.cn\/([0-9a-zA-Z]+)`, reply
 

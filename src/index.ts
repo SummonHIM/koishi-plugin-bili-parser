@@ -16,6 +16,9 @@ export interface Config {
   bBangumiImage: boolean;
   bBangumiEvaluate: boolean;
   bBangumiStat: boolean;
+  bArticleImage: boolean;
+  bArticleAuthor: boolean;
+  bArticleStat: boolean;
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -53,6 +56,12 @@ export const Config: Schema<Config> = Schema.intersect([
     bBangumiEvaluate: Schema.boolean().default(true).description("显示简介"),
     bBangumiStat: Schema.boolean().default(true).description("显示状态"),
   }).description("番剧设置"),
+
+  Schema.object({
+    bArticleImage: Schema.boolean().default(true).description("显示封面"),
+    bArticleAuthor: Schema.boolean().default(true).description("显示作者"),
+    bArticleStat: Schema.boolean().default(true).description("显示状态"),
+  }).description("专栏设置"),
 ]);
 
 export function apply(ctx: Context, config: Config) {

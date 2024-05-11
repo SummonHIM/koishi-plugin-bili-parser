@@ -4,6 +4,7 @@ import { Bili_Video } from "./bili_video";
 import { Bili_Live } from "./bili_live";
 import { Bili_Short } from "./bili_short";
 import { Bili_Bangumi } from "./bili_bangumi";
+import { Bili_Article } from "./bili_article";
 
 /**
  * 链接类型解析
@@ -27,6 +28,14 @@ export function link_type_parser(content: string): string[] {
     {
       pattern: /bilibili\.com\/bangumi\/media\/(md(\d+))/gim,
       type: "Bangumi",
+    },
+    {
+      pattern: /bilibili\.com\/read\/cv(\d+)/gim,
+      type: "Article",
+    },
+    {
+      pattern: /bilibili\.com\/read\/mobile(?:\?id=|\/)(\d+)/gim,
+      type: "Article",
     },
     // {
     //   pattern: /space\.bilibili\.com\/(\d+)/gim,
@@ -92,6 +101,12 @@ export async function type_processer(
       const bili_bangumi = new Bili_Bangumi(ctx, config);
       const bangumi_info = await bili_bangumi.gen_context(element["id"]);
       if (bangumi_info != null) ret += bangumi_info;
+      break;
+
+    case "Article":
+      const bili_article = new Bili_Article(ctx, config)
+      const article_info = await bili_article.gen_context(element["id"])
+      if (article_info != null) ret += article_info;
       break;
 
     // case "Space":
