@@ -54,12 +54,22 @@ export class Bili_Video {
     switch (vid["type"]) {
       case "av":
         ret = await this.ctx.http.get(
-          "https://api.bilibili.com/x/web-interface/view?aid=" + vid["id"]
+          "https://api.bilibili.com/x/web-interface/view?aid=" + vid["id"],
+          {
+            headers: {
+              "User-Agent": this.config.userAgent,
+            },
+          }
         );
         break;
       case "bv":
         ret = await this.ctx.http.get(
-          "https://api.bilibili.com/x/web-interface/view?bvid=" + vid["id"]
+          "https://api.bilibili.com/x/web-interface/view?bvid=" + vid["id"],
+          {
+            headers: {
+              "User-Agent": this.config.userAgent,
+            },
+          }
         );
         break;
       default:

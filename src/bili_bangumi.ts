@@ -57,21 +57,41 @@ export class Bili_Bangumi {
     switch (type) {
       case "ep":
         ret = await this.ctx.http.get(
-          "https://api.bilibili.com/pgc/view/web/season?ep_id=" + id
+          "https://api.bilibili.com/pgc/view/web/season?ep_id=" + id,
+          {
+            headers: {
+              "User-Agent": this.config.userAgent,
+            },
+          }
         );
         break;
       case "ss":
         ret = await this.ctx.http.get(
-          "https://api.bilibili.com/pgc/view/web/season?season_id=" + id
+          "https://api.bilibili.com/pgc/view/web/season?season_id=" + id,
+          {
+            headers: {
+              "User-Agent": this.config.userAgent,
+            },
+          }
         );
         break;
       case "md":
         const mdInfo = await this.ctx.http.get(
-          "https://api.bilibili.com/pgc/review/user?media_id=" + id
+          "https://api.bilibili.com/pgc/review/user?media_id=" + id,
+          {
+            headers: {
+              "User-Agent": this.config.userAgent,
+            },
+          }
         );
         ret = await this.ctx.http.get(
           "https://api.bilibili.com/pgc/view/web/season?season_id=" +
-            mdInfo["result"]["media"]["season_id"]
+            mdInfo["result"]["media"]["season_id"],
+          {
+            headers: {
+              "User-Agent": this.config.userAgent,
+            },
+          }
         );
         break;
       default:

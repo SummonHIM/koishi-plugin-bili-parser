@@ -35,7 +35,12 @@ export class Bili_Live {
    */
   async fetch_video_info(id: string) {
     var ret = await this.ctx.http.get(
-      "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=" + id
+      "https://api.live.bilibili.com/room/v1/Room/get_info?room_id=" + id,
+      {
+        headers: {
+          "User-Agent": this.config.userAgent,
+        },
+      }
     );
     return ret;
   }

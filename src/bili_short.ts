@@ -1,10 +1,13 @@
 import { Context } from "koishi";
+import { Config } from ".";
 
 export class Bili_Short {
   private ctx: Context;
+  private config: Config;
 
-  constructor(ctx: Context) {
+  constructor(ctx: Context, config: Config) {
     this.ctx = ctx;
+    this.config = config;
   }
 
   /**
@@ -15,6 +18,9 @@ export class Bili_Short {
   async get_redir_url(id: string) {
     var data = await this.ctx.http.get("https://b23.tv/" + id, {
       redirect: "manual",
+      headers: {
+        "User-Agent": this.config.userAgent,
+      },
     });
 
     const match = data.match(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"/i);

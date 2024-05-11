@@ -20,8 +20,7 @@ export class Bili_Audio {
       "https://www.bilibili.com/audio/music-service-c/web/song/info?sid=" + id,
       {
         headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+          "User-Agent": this.config.userAgent,
         },
       }
     );

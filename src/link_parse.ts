@@ -125,7 +125,7 @@ export async function type_processer(
     //   break;
 
     case "Short":
-      const bili_short = new Bili_Short(ctx);
+      const bili_short = new Bili_Short(ctx, config);
       const typed_link = link_type_parser(
         await bili_short.get_redir_url(element["id"])
       );

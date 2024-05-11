@@ -6,6 +6,7 @@ export const name = "bili-parser";
 export interface Config {
   parseLimit: number;
   showError: boolean;
+  userAgent: string;
   bVideoIDPreference: string;
   bVideoImage: boolean;
   bVideoDesc: boolean;
@@ -30,6 +31,11 @@ export const Config: Schema<Config> = Schema.intersect([
     showError: Schema.boolean()
       .default(false)
       .description("当链接不正确时提醒发送者"),
+    userAgent: Schema.string()
+      .default(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+      )
+      .description("所有 API 请求所用的 User-Agent"),
   }).description("基础设置"),
 
   Schema.object({
