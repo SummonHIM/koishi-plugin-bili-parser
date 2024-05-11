@@ -1,10 +1,13 @@
 import { Context } from "koishi";
+import { Config } from ".";
 
 export class Bili_Bangumi {
   private ctx: Context;
+  private config: Config;
 
-  constructor(ctx: Context) {
+  constructor(ctx: Context, config: Config) {
     this.ctx = ctx;
+    this.config = config;
   }
 
   /**
@@ -97,26 +100,30 @@ export class Bili_Bangumi {
           (episode: Number) => episode["ep_id"] == vid["id"]
         );
 
-        ret += `<img src=\"${episodes[epIndex]["cover"]}\"/>`;
+        this.config.bBangumiImage
+          ? (ret += `<img src=\"${episodes[epIndex]["cover"]}\"/>\n`)
+          : null;
         ret += `第 ${episodes[epIndex]["title"]} 话 - ${episodes[epIndex]["long_title"]}\n`;
-        ret += `点赞：${info["result"]["stat"]["likes"]}\t\t投币：${info["result"]["stat"]["coins"]}\n`;
-        ret += `收藏：${info["result"]["stat"]["favorites"]}\t\t转发：${info["result"]["stat"]["share"]}\n`;
-        ret +=
-          "https://www.bilibili.com/bangumi/play/ep" +
-          episodes[epIndex]["ep_id"] +
-          "\n";
+        this.config.bBangumiStat
+          ? (ret += `点赞：${info["result"]["stat"]["likes"]}\t\t投币：${info["result"]["stat"]["coins"]}\n
+收藏：${info["result"]["stat"]["favorites"]}\t\t转发：${info["result"]["stat"]["share"]}\n`)
+          : null;
+        ret += `https://www.bilibili.com/bangumi/play/ep${episodes[epIndex]["ep_id"]}\n`;
         break;
 
       case "ss":
       case "md":
-        ret += `<img src=\"${info["result"]["cover"]}\"/>`;
-        ret += info["result"]["evaluate"] + "\n";
-        ret += `点赞：${info["result"]["stat"]["likes"]}\t\t投币：${info["result"]["stat"]["coins"]}\n`;
-        ret += `收藏：${info["result"]["stat"]["favorites"]}\t\t转发：${info["result"]["stat"]["share"]}\n`;
-        ret +=
-          "https://www.bilibili.com/bangumi/media/md" +
-          info["result"]["media_id"] +
-          "\n";
+        this.config.bBangumiImage
+          ? (ret += `<img src=\"${info["result"]["cover"]}\"/>\n`)
+          : null;
+        this.config.bBangumiEvaluate
+          ? (ret += `${info["result"]["evaluate"]}\n`)
+          : null;
+        this.config.bBangumiStat
+          ? (ret += `点赞：${info["result"]["stat"]["likes"]}\t\t投币：${info["result"]["stat"]["coins"]}
+收藏：${info["result"]["stat"]["favorites"]}\t\t转发：${info["result"]["stat"]["share"]}\n`)
+          : null;
+        ret += `https://www.bilibili.com/bangumi/media/md${info["result"]["media_id"]}\n`;
         break;
 
       default:

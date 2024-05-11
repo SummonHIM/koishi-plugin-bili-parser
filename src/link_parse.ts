@@ -44,16 +44,6 @@ export function link_type_parser(content: string): string[] {
 
   var ret = [];
 
-  // linkRegex.forEach(function (rule) {
-  //   var match: string[];
-  //   while ((match = rule.pattern.exec(content)) !== null) {
-  //     ret.push({
-  //       type: rule.type,
-  //       id: match[1],
-  //     });
-  //   }
-  // });
-
   for (const rule of linkRegex) {
     var match: string[];
     let lastID: string;
@@ -84,24 +74,24 @@ export async function type_processer(
   config: Config,
   element: string
 ) {
-  var ret: string = null;
+  var ret: string = "";
   switch (element["type"]) {
     case "Video":
       const bili_video = new Bili_Video(ctx, config);
       const video_info = await bili_video.gen_context(element["id"]);
-      ret += video_info;
+      if (video_info != null) ret += video_info;
       break;
 
     case "Live":
-      const bili_live = new Bili_Live(ctx);
+      const bili_live = new Bili_Live(ctx, config);
       const live_info = await bili_live.gen_context(element["id"]);
-      ret += live_info;
+      if (live_info != null) ret += live_info;
       break;
 
     case "Bangumi":
-      const bili_bangumi = new Bili_Bangumi(ctx);
+      const bili_bangumi = new Bili_Bangumi(ctx, config);
       const bangumi_info = await bili_bangumi.gen_context(element["id"]);
-      ret += bangumi_info;
+      if (bangumi_info != null) ret += bangumi_info;
       break;
 
     // case "Space":
@@ -115,7 +105,7 @@ export async function type_processer(
       );
       for (const element of typed_link) {
         const final_info = await type_processer(ctx, config, element);
-        ret += final_info;
+        if (final_info != null) ret += final_info;
         break;
       }
       break;

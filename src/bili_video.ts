@@ -76,17 +76,32 @@ export class Bili_Video {
    */
   async gen_context(id: string) {
     const info = await this.fetch_video_info(id);
-    if (!info && !info["data"]) return null;
+    if (!info || !info["data"]) return null;
 
-    var ret = info["data"]["title"] + "\n";
-    ret += `<img src=\"${info["data"]["pic"]}\"/>`;
-    ret += info["data"]["desc"] + "\n";
-    ret += `点赞：${info["data"]["stat"]["like"]}\t\t投币：${info["data"]["stat"]["coin"]}\n`;
-    ret += `收藏：${info["data"]["stat"]["favorite"]}\t\t转发：${info["data"]["stat"]["share"]}\n`;
-    if (this.config.idPreference == "bv")
-      ret += "https://www.bilibili.com/video/" + info["data"]["bvid"] + "\n";
-    else if (this.config.idPreference == "av")
-      ret += "https://www.bilibili.com/video/av" + info["data"]["aid"] + "\n";
+    var ret = `${info["data"]["title"]}\n`;
+
+    this.config.bVideoImage
+      ? (ret += `<img src=\"${info["data"]["pic"]}\"/>\n`)
+      : null;
+
+    this.config.bVideoDesc ? (ret += `${info["data"]["desc"]}\n`) : null;
+
+    this.config.bVideoStat
+      ? (ret += `点赞：${info["data"]["stat"]["like"]}\t\t投币：${info["data"]["stat"]["coin"]}
+收藏：${info["data"]["stat"]["favorite"]}\t\t转发：${info["data"]["stat"]["share"]}\n`)
+      : null;
+
+    switch (this.config.bVideoIDPreference) {
+      case "bv":
+        ret += `https://www.bilibili.com/video/${info["data"]["bvid"]}\n`;
+        break;
+      case "av":
+        ret += `https://www.bilibili.com/video/av${info["data"]["aid"]}\n`;
+        break;
+      default:
+        break;
+    }
+
     return ret;
   }
 }
