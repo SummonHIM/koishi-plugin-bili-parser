@@ -43,7 +43,7 @@ export class Bili_Audio {
       : null;
 
     this.config.bMusicAuthor
-      ? (ret += `UP主：${info["data"]["uname"]}\t\t歌手:${info["data"]["author"]}\n`)
+      ? (ret += `UP主：${info["data"]["uname"]}\t\t歌手：${info["data"]["author"]}\n`)
       : null;
 
     this.config.bMusicStat

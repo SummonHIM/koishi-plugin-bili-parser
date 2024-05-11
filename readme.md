@@ -15,9 +15,11 @@ When regex match `bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)`, reply
 ```
 标题
 ![图片](图片链接)
+UP主：${name}
 介绍
 点赞：${like}	投币：${coin}
 收藏：${fav}	转发：${stat}
+观看：${views}	弹幕：${danmaku}
 https://www.bilibili.com/video/${id}
 ```
 
@@ -34,21 +36,23 @@ When regex match `live\.bilibili\.com(?:\/h5)?\/(\d+)`, reply
 https://live.bilibili.com/${id}
 ```
 
-### Live/直播
+### Bangumi/番剧
 When regex match `bilibili\.com\/bangumi\/play\/((ep|ss)(\d+))`, `bilibili\.com\/bangumi\/media\/(md(\d+))`, reply
 
 当正则表达式符合 `bilibili\.com\/bangumi\/play\/((ep|ss)(\d+))`，`bilibili\.com\/bangumi\/media\/(md(\d+))`，回复
 
 ```
-标题
+标题（${score}分）
 ![图片](图片链接)
+第 ${title} 话 - ${long_title}
 介绍
-点赞：${likes}	投币：${coins}
-收藏：${favs}	转发：${stat}
-https://www.bilibili.com/video/${id}
+点赞：${likes}		投币：${coins}
+追番：${favs}		转发：${stat}
+播放：${views}		弹幕：${danmakus}
+https://www.bilibili.com/bangumi/play/ep${id}
 ```
 
-### 专栏
+### Article/专栏
 When regex match `bilibili\.com\/read\/cv(\d+)`, `bilibili\.com\/read\/mobile(?:\?id=|\/)(\d+)`, reply
 
 当正则表达式符合 `bilibili\.com\/read\/cv(\d+)`，`bilibili\.com\/read\/mobile(?:\?id=|\/)(\d+)`，回复
@@ -56,10 +60,38 @@ When regex match `bilibili\.com\/read\/cv(\d+)`, `bilibili\.com\/read\/mobile(?:
 ```
 标题
 ![图片](图片链接)
-作者：作者名称
+UP主：作者名称
 点赞：${like}	投币：${coin}
 收藏：${fav}	转发：${stat}
 https://www.bilibili.com/read/cv${id}
+```
+
+### Audio/音乐
+When regex match `bilibili\.com\/audio\/au(\d+)`, reply
+
+当正则表达式符合 `bilibili\.com\/audio\/au(\d+)`，回复
+
+```
+标题
+![图片](图片链接)
+UP主：${up}		歌手：${author}
+播放：${play}	投币：${coin}
+收藏：${fav}	转发：${stat}
+https://www.bilibili.com/audio/au${id}
+```
+
+### Opus/动态
+When regex match `bilibili\.com\/opus\/(\d+)`, reply
+
+当正则表达式符合 `bilibili\.com\/opus\/(\d+)`，回复
+
+```
+用户名的动态
+内容
+![图片](图片链接)
+![图片](图片链接)...
+转发：${forward} | 评论：${comment} | 点赞：${like}
+https://www.bilibili.com/opus/${id}
 ```
 
 ### Short link/短链接

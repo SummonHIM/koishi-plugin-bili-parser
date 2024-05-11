@@ -142,7 +142,7 @@ export class Bili_Bangumi {
           : null;
 
         this.config.bBangumiStat
-          ? (ret += `收藏：${numeral(
+          ? (ret += `追番：${numeral(
               info["result"]["stat"]["favorites"],
               this.config
             )}\t\t转发：${numeral(
@@ -155,10 +155,7 @@ export class Bili_Bangumi {
           ? (ret += `播放：${numeral(
               info["result"]["stat"]["views"],
               this.config
-            )} | 追番：${numeral(
-              info["result"]["stat"]["favorites"],
-              this.config
-            )} | 弹幕：${numeral(
+            )}\t\t弹幕：${numeral(
               info["result"]["stat"]["danmakus"],
               this.config
             )}\n`)
