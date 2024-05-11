@@ -5,6 +5,7 @@ export const name = "bili-parser";
 
 export interface Config {
   parseLimit: number;
+  useNumeral: boolean;
   showError: boolean;
   userAgent: string;
   bVideoIDPreference: string;
@@ -31,6 +32,7 @@ export interface Config {
 export const Config: Schema<Config> = Schema.intersect([
   Schema.object({
     parseLimit: Schema.number().default(3).description("单对话多链接解析上限"),
+    useNumeral: Schema.boolean().default(true).description("使用格式化数字"),
     showError: Schema.boolean()
       .default(false)
       .description("当链接不正确时提醒发送者"),
@@ -71,7 +73,9 @@ export const Config: Schema<Config> = Schema.intersect([
     bBangumiImage: Schema.boolean().default(true).description("显示封面"),
     bBangumiEvaluate: Schema.boolean().default(true).description("显示简介"),
     bBangumiStat: Schema.boolean().default(true).description("显示状态"),
-    bBangumiExtraStat: Schema.boolean().default(true).description("显示额外状态"),
+    bBangumiExtraStat: Schema.boolean()
+      .default(true)
+      .description("显示额外状态"),
   }).description("番剧设置"),
 
   Schema.object({

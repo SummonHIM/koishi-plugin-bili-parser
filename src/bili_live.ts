@@ -1,5 +1,6 @@
 import { Context } from "koishi";
 import { Config } from ".";
+import numeral from "./numeral";
 
 export class Bili_Live {
   private ctx: Context;
@@ -65,7 +66,10 @@ export class Bili_Live {
     this.config.bLiveDesc ? (ret += `${info["data"]["description"]}\n`) : null;
 
     this.config.bLiveStat
-      ? (ret += `观看：${info["data"]["online"]}\t\t关注：${info["data"]["attention"]}\n`)
+      ? (ret += `观看：${numeral(
+          info["data"]["online"],
+          this.config
+        )}\t\t关注：${numeral(info["data"]["attention"], this.config)}\n`)
       : null;
 
     ret += `https://live.bilibili.com/${info["data"]["room_id"]}`;

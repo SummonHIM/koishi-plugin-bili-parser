@@ -1,5 +1,6 @@
 import { Context } from "koishi";
 import { Config } from ".";
+import numeral from "./numeral";
 
 export class Bili_Article {
   private ctx: Context;
@@ -46,8 +47,17 @@ export class Bili_Article {
       : null;
 
     this.config.bArticleStat
-      ? (ret += `点赞：${info["data"]["stats"]["like"]}\t\t投币：${info["data"]["stats"]["coin"]}
-收藏：${info["data"]["stats"]["favorite"]}\t\t转发：${info["data"]["stats"]["share"]}\n`)
+      ? (ret += `点赞：${numeral(
+          info["data"]["stats"]["like"],
+          this.config
+        )}\t\t投币：${numeral(info["data"]["stats"]["coin"], this.config)}\n`)
+      : null;
+
+    this.config.bArticleStat
+      ? (ret += `收藏：${numeral(
+          info["data"]["stats"]["favorite"],
+          this.config
+        )}\t\t转发：${numeral(info["data"]["stats"]["share"], this.config)}\n`)
       : null;
 
     ret += `https://www.bilibili.com/read/cv${id}`;

@@ -1,5 +1,6 @@
 import { Context } from "koishi";
 import { Config } from ".";
+import numeral from "./numeral";
 
 export class Bili_Audio {
   private ctx: Context;
@@ -46,8 +47,20 @@ export class Bili_Audio {
       : null;
 
     this.config.bMusicStat
-      ? (ret += `播放：${info["data"]["statistic"]["play"]}\t\t投币：${info["data"]["coin_num"]}
-收藏：${info["data"]["statistic"]["collect"]}\t\t转发：${info["data"]["statistic"]["share"]}\n`)
+      ? (ret += `播放：${numeral(
+          info["data"]["statistic"]["play"],
+          this.config
+        )}\t\t投币：${numeral(info["data"]["coin_num"], this.config)}\n`)
+      : null;
+
+    this.config.bMusicStat
+      ? (ret += `收藏：${numeral(
+          info["data"]["statistic"]["collect"],
+          this.config
+        )}\t\t转发：${numeral(
+          info["data"]["statistic"]["share"],
+          this.config
+        )}\n`)
       : null;
 
     ret += `https://www.bilibili.com/audio/au${id}`;

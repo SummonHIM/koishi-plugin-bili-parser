@@ -1,5 +1,6 @@
 import { Context } from "koishi";
 import { Config } from ".";
+import numeral from "./numeral";
 
 export class Bili_Video {
   private ctx: Context;
@@ -101,11 +102,24 @@ export class Bili_Video {
     this.config.bVideoDesc ? (ret += `${info["data"]["desc"]}\n`) : null;
 
     this.config.bVideoStat
-      ? (ret += `点赞：${info["data"]["stat"]["like"]}\t\t投币：${info["data"]["stat"]["coin"]}
-收藏：${info["data"]["stat"]["favorite"]}\t\t转发：${info["data"]["stat"]["share"]}\n`)
+      ? (ret += `点赞：${numeral(
+          info["data"]["stat"]["like"],
+          this.config
+        )}\t\t投币：${numeral(info["data"]["stat"]["coin"], this.config)}\n`)
       : null;
+
+    this.config.bVideoStat
+      ? (ret += `收藏：${numeral(
+          info["data"]["stat"]["favorite"],
+          this.config
+        )}\t\t转发：${numeral(info["data"]["stat"]["share"], this.config)}\n`)
+      : null;
+
     this.config.bVideoExtraStat
-      ? (ret += `观看：${info["data"]["stat"]["view"]}\t\t弹幕：${info["data"]["stat"]["danmaku"]}\n`)
+      ? (ret += `观看：${numeral(
+          info["data"]["stat"]["view"],
+          this.config
+        )}\t\t弹幕：${numeral(info["data"]["stat"]["danmaku"], this.config)}\n`)
       : null;
 
     switch (this.config.bVideoIDPreference) {
