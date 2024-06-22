@@ -5,6 +5,7 @@ export const name = "bili-parser";
 
 export interface Config {
   parseLimit: number;
+  showQuote: boolean;
   useNumeral: boolean;
   showError: boolean;
   userAgent: string;
@@ -34,6 +35,7 @@ export interface Config {
 export const Config: Schema<Config> = Schema.intersect([
   Schema.object({
     parseLimit: Schema.number().default(3).description("单对话多链接解析上限"),
+    showQuote: Schema.boolean().default(true).description("引用/回复原消息"),
     useNumeral: Schema.boolean().default(true).description("使用格式化数字"),
     showError: Schema.boolean()
       .default(false)
@@ -57,10 +59,10 @@ export const Config: Schema<Config> = Schema.intersect([
     bVideoDesc: Schema.boolean().default(true).description("显示简介"),
     bVideoStat: Schema.boolean()
       .default(true)
-      .description("显示状态（*三联信息*）"),
+      .description("显示状态 *（三联信息）*"),
     bVideoExtraStat: Schema.boolean()
       .default(true)
-      .description("显示额外状态（*弹幕&观看*）"),
+      .description("显示额外状态 *（弹幕&观看）*"),
   }).description("视频设置"),
 
   Schema.object({
@@ -104,7 +106,7 @@ export function apply(ctx: Context, config: Config) {
     if (links.length === 0) return next();
 
     var ret: string = "";
-    ret += [h("quote", { id: session.messageId })];
+    if (config.showQuote) ret += [h("quote", { id: session.messageId })];
     let countLink = 0;
 
     // 循环检测链接类型

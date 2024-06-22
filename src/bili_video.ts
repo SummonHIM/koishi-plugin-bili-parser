@@ -123,13 +123,12 @@ export class Bili_Video {
       : null;
 
     switch (this.config.bVideoIDPreference) {
-      case "bv":
-        ret += `https://www.bilibili.com/video/${info["data"]["bvid"]}\n`;
-        break;
       case "av":
         ret += `https://www.bilibili.com/video/av${info["data"]["aid"]}\n`;
         break;
+      case "bv":
       default:
+        ret += `https://www.bilibili.com/video/${info["data"]["bvid"]}\n`;
         break;
     }
 
