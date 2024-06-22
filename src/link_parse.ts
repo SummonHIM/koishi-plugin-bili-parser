@@ -13,10 +13,12 @@ import { Bili_Opus } from "./bili_opus";
  * @param content 传入消息
  * @returns type: "链接类型", id :"内容ID"
  */
-export function link_type_parser(content: string): string[] {
+export function link_type_parser(config: Config, content: string): string[] {
   var linkRegex = [
     {
-      pattern: /bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)/gim,
+      pattern: config.bVideoIDPrefex
+        ? /bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)/gim
+        : /([ab]v[0-9a-zA-Z]+)/gim,
       type: "Video",
     },
     {
@@ -138,6 +140,7 @@ export async function type_processer(
     case "Short":
       const bili_short = new Bili_Short(ctx, config);
       const typed_link = link_type_parser(
+        config,
         await bili_short.get_redir_url(element["id"])
       );
       for (const element of typed_link) {

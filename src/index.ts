@@ -10,6 +10,7 @@ export interface Config {
   showError: boolean;
   userAgent: string;
   bVideoIDPreference: string;
+  bVideoIDPrefex: boolean;
   bVideoImage: boolean;
   bVideoOwner: boolean;
   bVideoDesc: boolean;
@@ -54,55 +55,68 @@ export const Config: Schema<Config> = Schema.intersect([
     ])
       .default("bv")
       .description("ID 偏好"),
+    bVideoIDPrefex: Schema.boolean()
+      .default(true)
+      .description(
+        "满足链接前缀 *（若开启，则对话中必须包含 bilibili.com/video/xxx 格式才能解析。否则对话中仅需包含 AV/BV 号格式即可解析。）*"
+      ),
     bVideoImage: Schema.boolean().default(true).description("显示封面"),
     bVideoOwner: Schema.boolean().default(true).description("显示 UP 主"),
     bVideoDesc: Schema.boolean().default(true).description("显示简介"),
     bVideoStat: Schema.boolean()
       .default(true)
-      .description("显示状态 *（三联信息）*"),
+      .description("显示状态 *（三连）*"),
     bVideoExtraStat: Schema.boolean()
       .default(true)
-      .description("显示额外状态 *（弹幕&观看）*"),
+      .description("显示额外状态 *（观看&弹幕）*"),
   }).description("视频设置"),
 
   Schema.object({
-    bLiveImage: Schema.boolean()
-      .default(true)
-      .description("显示封面 *（由 API 截取的当前帧画面）*"),
+    bLiveImage: Schema.boolean().default(true).description("显示封面"),
     bLiveDesc: Schema.boolean().default(true).description("显示简介"),
-    bLiveStat: Schema.boolean().default(true).description("显示状态"),
+    bLiveStat: Schema.boolean()
+      .default(true)
+      .description("显示状态 *（观看&关注）*"),
   }).description("直播设置"),
 
   Schema.object({
     bBangumiImage: Schema.boolean().default(true).description("显示封面"),
     bBangumiEvaluate: Schema.boolean().default(true).description("显示简介"),
-    bBangumiStat: Schema.boolean().default(true).description("显示状态"),
+    bBangumiStat: Schema.boolean()
+      .default(true)
+      .description("显示状态 *（三连）*"),
     bBangumiExtraStat: Schema.boolean()
       .default(true)
-      .description("显示额外状态"),
+      .description("显示额外状态 *（播放&弹幕）*"),
   }).description("番剧设置"),
 
   Schema.object({
     bArticleImage: Schema.boolean().default(true).description("显示封面"),
     bArticleAuthor: Schema.boolean().default(true).description("显示作者"),
-    bArticleStat: Schema.boolean().default(true).description("显示状态"),
+    bArticleStat: Schema.boolean()
+      .default(true)
+      .description("显示状态 *（三连）*"),
   }).description("专栏设置"),
 
   Schema.object({
     bMusicImage: Schema.boolean().default(true).description("显示封面"),
     bMusicAuthor: Schema.boolean().default(true).description("显示作者"),
-    bMusicStat: Schema.boolean().default(true).description("显示状态"),
+    bMusicStat: Schema.boolean()
+      .default(true)
+      .description("显示状态 *（三连）*"),
   }).description("音乐设置"),
 
   Schema.object({
     bOpusImage: Schema.boolean().default(true).description("显示图片"),
-    bOpusStat: Schema.boolean().default(true).description("显示状态"),
+    bOpusStat: Schema.boolean()
+      .default(true)
+      .description("显示状态 *（转发&评论&点赞）*"),
   }).description("动态设置"),
 ]);
 
 export function apply(ctx: Context, config: Config) {
   ctx.middleware(async (session, next) => {
-    const links = link_type_parser(session.content);
+    const links = link_type_parser(config, session.content);
     if (links.length === 0) return next();
 
     var ret: string = "";
