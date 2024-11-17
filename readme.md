@@ -6,6 +6,11 @@ A koishi plugin use to parse bilibili links.
 
 一个能够解析 BiliBili 链接的 Koishi 插件。
 
+## Depends/前置依赖
+
+- [handlebars](https://handlebarsjs.com/)
+- [numbro](https://numbrojs.com/)
+
 ## Usage/使用方法
 ### Video/视频
 When regex match `bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)`, reply
