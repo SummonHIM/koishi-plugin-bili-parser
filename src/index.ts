@@ -1,43 +1,38 @@
-import { Context, Schema, h } from "koishi";
-import { link_type_parser, type_processer } from "./link_parse";
+import { type Context, Schema } from "koishi"
+import { type_processer } from "./link_parse"
 
-export const name = "bili-parser";
+export const name = "bili-parser"
 
 export interface Config {
-  parseLimit: number;
-  showQuote: boolean;
-  useNumeral: boolean;
-  showError: boolean;
-  userAgent: string;
-  bVideoIDPreference: string;
-  bVideoIDPrefex: boolean;
-  bVideoImage: boolean;
-  bVideoOwner: boolean;
-  bVideoDesc: boolean;
-  bVideoStat: boolean;
-  bVideoExtraStat: boolean;
-  bLiveImage: boolean;
-  bLiveDesc: boolean;
-  bLiveStat: boolean;
-  bBangumiImage: boolean;
-  bBangumiEvaluate: boolean;
-  bBangumiStat: boolean;
-  bBangumiExtraStat: boolean;
-  bArticleImage: boolean;
-  bArticleAuthor: boolean;
-  bArticleStat: boolean;
-  bMusicImage: boolean;
-  bMusicAuthor: boolean;
-  bMusicStat: boolean;
-  bOpusImage: boolean;
-  bOpusStat: boolean;
+  parseLimit: number
+  showQuote: boolean
+  userAgent: string
+  cookies: string
+
+  bVideoFullURL: boolean
+  bVideoRetPreset: string
+
+  bLiveRetPreset: string
+
+  bBangumiFullURL: boolean
+  bBangumiRetPreset: string
+  bEpisodeRetPreset: string
+
+  bArticleFullURL: boolean
+  bArticleRetPreset: string
+
+  // bAudioFullURL: boolean
+  // bAudioRetPreset: string
+
+  bOpusRetPreset: string
+
+  bSpaceRetPreset: string
 }
 
 export const Config: Schema<Config> = Schema.intersect([
   Schema.object({
     parseLimit: Schema.number().default(3).description("单对话多链接解析上限"),
     showQuote: Schema.boolean().default(true).description("引用/回复原消息"),
-    useNumeral: Schema.boolean().default(true).description("使用格式化数字"),
     showError: Schema.boolean()
       .default(false)
       .description("当链接不正确时提醒发送者"),
@@ -46,101 +41,131 @@ export const Config: Schema<Config> = Schema.intersect([
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
       )
       .description("所有 API 请求所用的 User-Agent"),
+    cookies: Schema.string()
+      .description("所有 API 请求所用的 cookies"),
   }).description("基础设置"),
 
   Schema.object({
-    bVideoIDPreference: Schema.union([
-      Schema.const("bv").description("BV 号"),
-      Schema.const("av").description("AV 号"),
-    ])
-      .default("bv")
-      .description("ID 偏好"),
-    bVideoIDPrefex: Schema.boolean()
+    bVideoFullURL: Schema.boolean()
       .default(true)
       .description(
-        "满足链接前缀 *（若开启，则对话中必须包含 bilibili.com/video/xxx 格式才能解析。否则对话中仅需包含 AV/BV 号格式即可解析。）*"
+        "需要完整链接 *（若关闭，则仅需 AV/BV 号即可解析）*"
       ),
-    bVideoImage: Schema.boolean().default(true).description("显示封面"),
-    bVideoOwner: Schema.boolean().default(true).description("显示 UP 主"),
-    bVideoDesc: Schema.boolean().default(true).description("显示简介"),
-    bVideoStat: Schema.boolean()
-      .default(true)
-      .description("显示状态 *（三连）*"),
-    bVideoExtraStat: Schema.boolean()
-      .default(true)
-      .description("显示额外状态 *（观看&弹幕）*"),
+    bVideoRetPreset: Schema.string()
+      .default(`{{title}}
+<img src=\"{{pic}}\" />
+UP主：{{owner.name}}
+{{truncate desc 35}}
+点赞：{{formatNumber stat.like}}\t\t投币：{{formatNumber stat.coin}}
+收藏：{{formatNumber stat.favorite}}\t\t转发：{{formatNumber stat.share}}
+观看：{{formatNumber stat.view}}\t\t弹幕：{{formatNumber stat.danmaku}}
+https://www.bilibili.com/video/{{bvid}}`)
+      .role('textarea', { rows: [8, 4] })
+      .description("返回的文本预设"),
   }).description("视频设置"),
 
   Schema.object({
-    bLiveImage: Schema.boolean().default(true).description("显示封面"),
-    bLiveDesc: Schema.boolean().default(true).description("显示简介"),
-    bLiveStat: Schema.boolean()
-      .default(true)
-      .description("显示状态 *（观看&关注）*"),
+    bLiveRetPreset: Schema.string()
+      .default(`[{{formatLiveStatus live_status}}]{{title}}
+<img src=\"{{user_cover}}\" />
+{{description}}
+观看：{{formatNumber online}}\t\t关注：{{formatNumber attention}}
+https://live.bilibili.com/{{room_id}}`)
+      .role('textarea', { rows: [8, 4] })
+      .description("返回的文本预设"),
   }).description("直播设置"),
 
   Schema.object({
-    bBangumiImage: Schema.boolean().default(true).description("显示封面"),
-    bBangumiEvaluate: Schema.boolean().default(true).description("显示简介"),
-    bBangumiStat: Schema.boolean()
+    bBangumiFullURL: Schema.boolean()
       .default(true)
-      .description("显示状态 *（三连）*"),
-    bBangumiExtraStat: Schema.boolean()
-      .default(true)
-      .description("显示额外状态 *（播放&弹幕）*"),
-  }).description("番剧设置"),
+      .description(
+        "需要完整链接 *（若关闭，则仅需 EP/SS/MD 号即可解析）*"
+      ),
+    bBangumiRetPreset: Schema.string()
+      .default(`{{season_title}}（{{rating.score}}分）
+<img src=\"{{cover}}\" />
+{{truncate evaluate 35}}
+点赞：{{formatNumber stat.likes}}\t\t投币：{{formatNumber stat.coins}}
+追番：{{formatNumber stat.favorites}}\t\t转发：{{formatNumber stat.share}}
+播放：{{formatNumber stat.views}}\t\t弹幕：{{formatNumber stat.danmakus}}
+https://www.bilibili.com/bangumi/media/md{{media_id}}`)
+      .role('textarea', { rows: [8, 4] })
+      .description("返回的番剧集文本预设"),
+    bEpisodeRetPreset: Schema.string()
+      .default(`{{season_title}}（{{rating.score}}分）
+<img src=\"{{getCurrentEpisode "cover"}}\" />
+第 {{getCurrentEpisode "title"}} 话 - {{getCurrentEpisode "long_title"}}
+{{truncate evaluate 35}}
+点赞：{{formatNumber stat.likes}}\t\t投币：{{formatNumber stat.coins}}
+追番：{{formatNumber stat.favorites}}\t\t转发：{{formatNumber stat.share}}
+播放：{{formatNumber stat.views}}\t\t弹幕：{{formatNumber stat.danmakus}}
+https://www.bilibili.com/bangumi/play/ep{{getCurrentEpisode "ep_id"}}`)
+      .role('textarea', { rows: [8, 4] })
+      .description("返回的具体集文本预设"),
+  }).description("番剧集设置"),
 
   Schema.object({
-    bArticleImage: Schema.boolean().default(true).description("显示封面"),
-    bArticleAuthor: Schema.boolean().default(true).description("显示作者"),
-    bArticleStat: Schema.boolean()
+    bArticleFullURL: Schema.boolean()
       .default(true)
-      .description("显示状态 *（三连）*"),
+      .description(
+        "需要完整链接 *（若关闭，则仅需 CV 号即可解析）*"
+      ),
+    bArticleRetPreset: Schema.string()
+      .default(`{{title}}
+<img src=\"{{banner_url}}\" />
+UP主：{{author_name}}
+点赞：{{formatNumber stats.like}}\t\t投币：{{formatNumber stats.coin}}
+观看：{{formatNumber stats.view}} | 收藏：{{formatNumber stats.favorite}} | 转发：{{formatNumber stats.share}}
+https://www.bilibili.com/read/{{getArticleID}}`)
+      .role('textarea', { rows: [8, 4] })
+      .description("返回的文本预设"),
   }).description("专栏设置"),
 
-  Schema.object({
-    bMusicImage: Schema.boolean().default(true).description("显示封面"),
-    bMusicAuthor: Schema.boolean().default(true).description("显示作者"),
-    bMusicStat: Schema.boolean()
-      .default(true)
-      .description("显示状态 *（三连）*"),
-  }).description("音乐设置"),
+//   Schema.object({
+//     bAudioFullURL: Schema.boolean()
+//       .default(true)
+//       .description(
+//         "需要完整链接 *（若关闭，则仅需 AU 号即可解析）*"
+//       ),
+//     bAudioRetPreset: Schema.string()
+//       .default(`{{title}}
+// <img src=\"{{cover}}\" />
+// UP主：{{uname}}\t\t歌手：{{author}}
+// 播放：{{formatNumber statistic.play}}\t\t投币：{{formatNumber coin_num}}
+// 收藏：{{formatNumber statistic.collect}}\t\t转发：{{formatNumber statistic.share}}
+// https://www.bilibili.com/audio/au{{id}}`)
+//       .role('textarea', { rows: [8, 4] })
+//       .description("返回的文本预设"),
+//   }).description("歌曲设置"),
 
   Schema.object({
-    bOpusImage: Schema.boolean().default(true).description("显示图片"),
-    bOpusStat: Schema.boolean()
-      .default(true)
-      .description("显示状态 *（转发&评论&点赞）*"),
+    bOpusRetPreset: Schema.string()
+      .default(`{{modules.module_author.name}}的动态
+<img src=\"{{modules.module_dynamic.additional.goods.items.[0].cover}}\" />
+{{modules.module_dynamic.desc.text}}
+转发：{{formatNumber modules.module_stat.forward.count}} | 评论：{{formatNumber modules.module_stat.comment.count}} | 点赞：{{formatNumber modules.module_stat.like.count}}`)
+      .role('textarea', { rows: [8, 4] })
+      .description("返回的文本预设"),
   }).description("动态设置"),
-]);
+
+  Schema.object({
+    bSpaceRetPreset: Schema.string()
+      .default(`{{module_author.name}}
+<img src=\"{{module_author.face}}\" />
+https://space.bilibili.com/{{module_author.mid}}`)
+      .role('textarea', { rows: [8, 4] })
+      .description("返回的文本预设"),
+  }).description("控件设置"),
+])
 
 export function apply(ctx: Context, config: Config) {
   ctx.middleware(async (session, next) => {
-    const links = link_type_parser(config, session.content);
-    if (links.length === 0) return next();
+    const retMsg = type_processer(session, ctx, config)
 
-    var ret: string = "";
-    if (config.showQuote) ret += [h("quote", { id: session.messageId })];
-    let countLink = 0;
-
-    // 循环检测链接类型
-    for (const element of links) {
-      if (countLink >= 1) ret += "\n";
-      if (countLink >= config.parseLimit) {
-        ret += "已达到解析上限…";
-        break;
-      }
-
-      const tp_ret = await type_processer(ctx, config, element);
-      if (tp_ret == "") {
-        if (config.showError)
-          ret = "无法解析链接信息。可能是 ID 不存在，或该类型可能暂不支持。";
-        else ret = null;
-      } else ret += tp_ret;
-
-      countLink++;
+    if (await retMsg !== "") {
+      return retMsg
     }
-
-    return ret;
-  });
+    return next()
+  })
 }
+

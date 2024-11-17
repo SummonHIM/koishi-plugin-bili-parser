@@ -1,5 +1,5 @@
-import { Context } from "koishi";
-import { Config } from ".";
+import type { Context } from "koishi";
+import type { Config } from "..";
 
 export class Bili_Short {
   private ctx: Context;
@@ -16,7 +16,7 @@ export class Bili_Short {
    * @returns 正常链接
    */
   async get_redir_url(id: string) {
-    var data = await this.ctx.http.get("https://b23.tv/" + id, {
+    const data = await this.ctx.http.get(`https://b23.tv/${id}`, {
       redirect: "manual",
       headers: {
         "User-Agent": this.config.userAgent,
@@ -25,6 +25,6 @@ export class Bili_Short {
 
     const match = data.match(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"/i);
     if (match) return match[1];
-    else return null;
+    return null;
   }
 }
