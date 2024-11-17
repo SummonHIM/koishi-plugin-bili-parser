@@ -1,7 +1,7 @@
 {
   "name": "@summonhim/koishi-plugin-bili-parser",
   "description": "A koishi plugin use to parse bilibili links.",
-  "version": "1.2.0.rc.1",
+  "version": "1.2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
