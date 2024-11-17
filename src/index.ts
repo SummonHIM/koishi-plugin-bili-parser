@@ -162,7 +162,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.middleware(async (session, next) => {
     const retMsg = type_processer(session, ctx, config)
 
-    if (await retMsg !== "") {
+    if (await retMsg !== "" || await retMsg !== null) {
       return retMsg
     }
     return next()

@@ -112,6 +112,8 @@ export async function type_processer(
 ) {
   const links = link_type_parser(session.content, config)
 
+  if (links.length === 0) return null
+
   Handlebars.registerHelper('formatNumber', (value: number) => {
     return numbro(value).format({ average: true, mantissa: 1, optionalMantissa: true })
   })
@@ -129,10 +131,8 @@ export async function type_processer(
   })
 
 
-  let ret = ""
+  let ret = config.showQuote ? `${[h("quote", { id: session.messageId })]}` : ""
   let countLink = 0
-
-  if (config.showQuote) ret += [h("quote", { id: session.messageId })]
 
   for (const link of links) {
     if (countLink >= 1) ret += "\n------\n"
