@@ -1,6 +1,6 @@
 import type { Context } from "koishi"
 import Handlebars from 'handlebars'
-import type { Config } from ".."
+import { type Config, logger } from ".."
 
 export class Bili_Live {
   private ctx: Context
@@ -52,7 +52,7 @@ export class Bili_Live {
    * @param id 直播 ID
    * @returns 文字直播信息
    */
-  async gen_context(id: string) {
+  async gen_context(id: string, config: Config) {
     const info = await this.fetch_video_info(id)
     if (info.code !== 0) throw (`Fetching live api failed. Code: ${info.code}`)
 
@@ -60,6 +60,7 @@ export class Bili_Live {
       return this.getStatusText(value)
     })
     const template = Handlebars.compile(this.config.bLiveRetPreset)
+    logger.debug("bLive api return: ", info.data)
     return template(info.data)
   }
 }

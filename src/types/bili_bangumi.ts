@@ -1,6 +1,6 @@
 import type { Context, Dict } from "koishi"
 import Handlebars from 'handlebars'
-import type { Config } from ".."
+import { type Config, logger } from ".."
 
 export class Bili_Bangumi {
   private ctx: Context
@@ -113,7 +113,7 @@ export class Bili_Bangumi {
    * @param id 番剧 ID
    * @returns 文字番剧信息
    */
-  async gen_context(id: string) {
+  async gen_context(id: string, config: Config) {
     const vid = this.bgm_type_parse(id)
     const info = await this.fetch_video_info(vid.type, vid.id)
 
@@ -147,6 +147,7 @@ export class Bili_Bangumi {
       }
     }
 
+    logger.debug("bBangumi api return: ", info.result)
     return ret
   }
 }

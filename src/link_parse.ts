@@ -1,7 +1,7 @@
 import { type Context, type Session, h } from "koishi"
 import numbro from 'numbro'
 import Handlebars from 'handlebars'
-import type { Config } from "."
+import { type Config, logger } from "."
 import { Bili_Video } from "./types/bili_video"
 import { Bili_Short } from "./types/bili_short"
 import { Bili_Live } from "./types/bili_live"
@@ -23,7 +23,7 @@ interface linkType {
  * @param config 插件设置
  * @returns [{type: "链接类型", id :"内容ID"}]
  */
-export function link_type_parser(content: string, config: Config): linkType[] {
+function link_type_parser(content: string, config: Config): linkType[] {
   const linkRegex = [
     {
       pattern: config.bVideoFullURL
@@ -95,17 +95,101 @@ export function link_type_parser(content: string, config: Config): linkType[] {
     }
   })
 
+  logger.debug("Links: ", results)
   return results
 }
 
 /**
- * 类型执行器
+ * 类型解析器
+ * @param links 链接数组
+ * @param ctx Context
+ * @param config Config
+ * @returns 解析来的文本
+ */
+async function type_parser(links: linkType[], ctx: Context, config: Config) {
+  let ret = ""
+  let countLink = 0
+
+  for (const link of links) {
+    if (countLink >= 1) ret += `\n${config.customDelimiter}\n`
+    if (countLink >= config.parseLimit) {
+      ret += "已达到解析上限…"
+      break
+    }
+
+    switch (link.type) {
+      case "Video": {
+        const bili_video = new Bili_Video(ctx, config)
+        const video_info = await bili_video.gen_context(link.id, config)
+        if (video_info != null) ret += video_info
+        break
+      }
+
+      case "Live": {
+        const bili_live = new Bili_Live(ctx, config)
+        const live_info = await bili_live.gen_context(link.id, config)
+        if (live_info != null) ret += live_info
+        break
+      }
+
+      case "Bangumi": {
+        const bili_bangumi = new Bili_Bangumi(ctx, config)
+        const bangumi_info = await bili_bangumi.gen_context(link.id, config)
+        if (bangumi_info != null) ret += bangumi_info
+        break
+      }
+
+      case "Article": {
+        const bili_article = new Bili_Article(ctx, config)
+        const article_info = await bili_article.gen_context(link.id, config)
+        if (article_info != null) ret += article_info
+        break
+      }
+
+      // case "Audio": {
+      //   const bili_audio = new Bili_Audio(ctx, config)
+      //   const audio_info = await bili_audio.gen_context(link.id)
+      //   if (audio_info != null) ret += audio_info
+      //   break
+      // }
+
+      case "Opus": {
+        const bili_opus = new Bili_Opus(ctx, config)
+        const opus_info = await bili_opus.gen_context(link.id, config)
+        if (opus_info != null) ret += opus_info
+        break
+      }
+
+      case "Space": {
+        const bili_space = new Bili_Space(ctx, config)
+        const space_info = await bili_space.gen_context(link.id, config)
+        if (space_info != null) ret += space_info
+        break
+      }
+
+      case "Short": {
+        const bili_short = new Bili_Short(ctx, config)
+        const links = link_type_parser(await bili_short.get_redir_url(link.id), config)
+        const final_info = await type_parser(links, ctx, config)
+        if (final_info !== null) ret += final_info
+        break
+      }
+    }
+
+    countLink++
+  }
+
+  return ret
+}
+
+/**
+ * 链接解析器
  * @param ctx Context
  * @param config Config
  * @param element 链接列表
  * @returns 解析来的文本
  */
-export async function type_processer(
+export default async function link_parser(
   session: Session,
   ctx: Context,
   config: Config,
@@ -131,76 +215,10 @@ export async function type_processer(
   })
 
 
-  let ret = config.showQuote ? `${[h("quote", { id: session.messageId })]}` : ""
-  let countLink = 0
+  let ret = config.showQuote ? `${[h("quote", { id: session.messageId })]}\n` : ""
 
-  for (const link of links) {
-    if (countLink >= 1) ret += "\n------\n"
-    if (countLink >= config.parseLimit) {
-      ret += "已达到解析上限…"
-      break
-    }
+  ret += await type_parser(links, ctx, config)
 
-    switch (link.type) {
-      case "Video": {
-        const bili_video = new Bili_Video(ctx, config)
-        const video_info = await bili_video.gen_context(link.id)
-        if (video_info != null) ret += video_info
-        break
-      }
-
-      case "Live": {
-        const bili_live = new Bili_Live(ctx, config)
-        const live_info = await bili_live.gen_context(link.id)
-        if (live_info != null) ret += live_info
-        break
-      }
-
-      case "Bangumi": {
-        const bili_bangumi = new Bili_Bangumi(ctx, config)
-        const bangumi_info = await bili_bangumi.gen_context(link.id)
-        if (bangumi_info != null) ret += bangumi_info
-        break
-      }
-
-      case "Article": {
-        const bili_article = new Bili_Article(ctx, config)
-        const article_info = await bili_article.gen_context(link.id)
-        if (article_info != null) ret += article_info
-        break
-      }
-
-      // case "Audio": {
-      //   const bili_audio = new Bili_Audio(ctx, config)
-      //   const audio_info = await bili_audio.gen_context(link.id)
-      //   if (audio_info != null) ret += audio_info
-      //   break
-      // }
-
-      case "Opus": {
-        const bili_opus = new Bili_Opus(ctx, config)
-        const opus_info = await bili_opus.gen_context(link.id)
-        if (opus_info != null) ret += opus_info
-        break
-      }
-
-      case "Space": {
-        const bili_space = new Bili_Space(ctx, config)
-        const space_info = await bili_space.gen_context(link.id)
-        if (space_info != null) ret += space_info
-        break
-      }
-
-      case "Short": {
-        const bili_short = new Bili_Short(ctx, config)
-        const final_info = await type_processer(await bili_short.get_redir_url(link.id), ctx, config)
-        if (final_info !== null) ret += final_info
-        break
-      }
-    }
-
-    countLink++
-  }
-
+  logger.debug("Generated message: ", ret)
   return ret
 }

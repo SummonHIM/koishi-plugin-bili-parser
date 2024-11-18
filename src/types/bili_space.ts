@@ -1,6 +1,6 @@
 import type { Context } from "koishi"
 import Handlebars from 'handlebars'
-import type { Config } from ".."
+import { type Config, logger } from ".."
 
 export class Bili_Space {
   private ctx: Context
@@ -34,12 +34,13 @@ export class Bili_Space {
    * @param id 用户 ID
    * @returns 文字用户信息
    */
-  async gen_context(id: string) {
+  async gen_context(id: string, config: Config) {
     const info = await this.fetch_space_info(id)
 
     if (info.code !== 0) throw (`Fetching space api failed. Code: ${info.code}`)
 
     const template = Handlebars.compile(this.config.bSpaceRetPreset)
+    logger.debug("bSpace api return: ", info.data.items[0].modules)
     return template(info.data.items[0].modules)
   }
 }

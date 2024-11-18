@@ -8,8 +8,8 @@ A koishi plugin use to parse bilibili links.
 
 ## Depends/前置依赖
 
-- [handlebars](https://handlebarsjs.com/)
-- [numbro](https://numbrojs.com/)
+- [handlebars](https://www.npmjs.com/package/handlebars)
+- [numbro](https://www.npmjs.com/package/numbro)
 
 ## Usage/使用方法
 ### Video/视频
@@ -122,27 +122,34 @@ When regex match `https:\\\/\\\/b23.tv\\\/(.+)\?`, reply
 
 假如说你需要修改视频的文本预设：
 
-1. 前去 [/src/types](/src/types)。找到处理视频的代码 bili_video.ts。将其打开。
-2. 在函数 fetch_video_info 中你可找到一段域名为 api.bilibili.com 的 API 链接。将其粘贴到浏览器。并将需要修改的 ID 变量修改为正确的变量。
-3. 假如说 API 返回的 Json 结果如下：
+1. 为本插件开启调试日志。
+
+koishi.yml
+```Yaml
+logger:
+  levels:
+    bili-parser: 3
+```
+
+2. 发送一个视频链接给 Bot。此时日志会输出从 API 中获取来的 Json 数据。例：
+
 ```Json
-{
-    "code": 0,
-    "data": {
-        "name": "SummonHIM",
-        "id": "11223344",
-        "dict": {
-            "aa": "AA",
-            "bb": "BB"
-        },
-        "array": [
-            123,
-            "fjt"
-        ]
-    }
+bVideo api return: {
+    "name": "SummonHIM",
+    "id": "11223344",
+    "dict": {
+        "aa": "AA",
+        "bb": "BB"
+    },
+    "array": [
+        123,
+        "HIM"
+    ]
 }
 ```
-3. 查看 gen_context 函数。一般会有个 template 函数。template(info.data) 即为占位符仅在 "data" 字典里生效。例：
+
+3. 根据以上 Json 数据来编写自定义的文本预设占位符。
+
 ```
 {{name}} - {{id}}
 {{dict.aa}} - {{dict.bb}}
@@ -152,7 +159,21 @@ When regex match `https:\\\/\\\/b23.tv\\\/(.+)\?`, reply
 ```
 SummonHIM - 11223344
 AA - BB
-123 - fjt
+123 - HIM
 ```
 
 有关更多占位符使用方法，请参阅 [Handlebars.js](https://handlebarsjs.com/)。
+
+### Handlebars Helper 介绍
+#### 全局
+- formatNumber: 数字简化，例："formatNumber 1638" 会转换为 "1.6k"。
+- truncate: 字符串截断，例："truncate 啊啊啊啊啊啊啊啊啊啊啊 5" 会被省略为“啊啊啊啊啊啊…”。
+
+#### 专栏
+- getArticleID: 用于返回专栏 ID。
+
+#### 番剧
+- getCurrentEpisode: 返回当前集的字典。例：'getCurrentEpisode "title"' 会返回当前集的标题。
+
+#### 直播
+- formatLiveStatus: 文字化当前直播状态。例："formatNumber online"。

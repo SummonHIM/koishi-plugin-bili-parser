@@ -1,11 +1,14 @@
-import { type Context, Schema } from "koishi"
-import { type_processer } from "./link_parse"
+import { type Context, Logger, Schema } from "koishi"
+import link_parser from "./link_parse"
 
 export const name = "bili-parser"
+
+export const logger = new Logger("bili-parser")
 
 export interface Config {
   parseLimit: number
   showQuote: boolean
+  customDelimiter: string
   userAgent: string
   cookies: string
 
@@ -33,9 +36,9 @@ export const Config: Schema<Config> = Schema.intersect([
   Schema.object({
     parseLimit: Schema.number().default(3).description("单对话多链接解析上限"),
     showQuote: Schema.boolean().default(true).description("引用/回复原消息"),
-    showError: Schema.boolean()
-      .default(false)
-      .description("当链接不正确时提醒发送者"),
+    customDelimiter: Schema.string()
+      .default("------")
+      .description("自定义分隔符。*当出现多链接时使用的分隔符*"),
     userAgent: Schema.string()
       .default(
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
@@ -112,38 +115,44 @@ https://www.bilibili.com/bangumi/play/ep{{getCurrentEpisode "ep_id"}}`)
       ),
     bArticleRetPreset: Schema.string()
       .default(`{{title}}
-<img src=\"{{banner_url}}\" />
+<img src=\"{{image_urls.[0]}}\" />
 UP主：{{author_name}}
 点赞：{{formatNumber stats.like}}\t\t投币：{{formatNumber stats.coin}}
-观看：{{formatNumber stats.view}} | 收藏：{{formatNumber stats.favorite}} | 转发：{{formatNumber stats.share}}
-https://www.bilibili.com/read/{{getArticleID}}`)
+阅读：{{formatNumber stats.view}} | 收藏：{{formatNumber stats.favorite}} | 转发：{{formatNumber stats.share}}
+https://www.bilibili.com/read/cv{{getArticleID}}`)
       .role('textarea', { rows: [8, 4] })
       .description("返回的文本预设"),
   }).description("专栏设置"),
 
-//   Schema.object({
-//     bAudioFullURL: Schema.boolean()
-//       .default(true)
-//       .description(
-//         "需要完整链接 *（若关闭，则仅需 AU 号即可解析）*"
-//       ),
-//     bAudioRetPreset: Schema.string()
-//       .default(`{{title}}
-// <img src=\"{{cover}}\" />
-// UP主：{{uname}}\t\t歌手：{{author}}
-// 播放：{{formatNumber statistic.play}}\t\t投币：{{formatNumber coin_num}}
-// 收藏：{{formatNumber statistic.collect}}\t\t转发：{{formatNumber statistic.share}}
-// https://www.bilibili.com/audio/au{{id}}`)
-//       .role('textarea', { rows: [8, 4] })
-//       .description("返回的文本预设"),
-//   }).description("歌曲设置"),
+  //   Schema.object({
+  //     bAudioFullURL: Schema.boolean()
+  //       .default(true)
+  //       .description(
+  //         "需要完整链接 *（若关闭，则仅需 AU 号即可解析）*"
+  //       ),
+  //     bAudioRetPreset: Schema.string()
+  //       .default(`{{title}}
+  // <img src=\"{{cover}}\" />
+  // UP主：{{uname}}\t\t歌手：{{author}}
+  // 播放：{{formatNumber statistic.play}}\t\t投币：{{formatNumber coin_num}}
+  // 收藏：{{formatNumber statistic.collect}}\t\t转发：{{formatNumber statistic.share}}
+  // https://www.bilibili.com/audio/au{{id}}`)
+  //       .role('textarea', { rows: [8, 4] })
+  //       .description("返回的文本预设"),
+  //   }).description("歌曲设置"),
 
   Schema.object({
     bOpusRetPreset: Schema.string()
       .default(`{{modules.module_author.name}}的动态
-<img src=\"{{modules.module_dynamic.additional.goods.items.[0].cover}}\" />
-{{modules.module_dynamic.desc.text}}
-转发：{{formatNumber modules.module_stat.forward.count}} | 评论：{{formatNumber modules.module_stat.comment.count}} | 点赞：{{formatNumber modules.module_stat.like.count}}`)
+<img src=\"{{modules.module_author.face}}\" />
+{{#if modules.module_dynamic.desc.text}}
+  {{modules.module_dynamic.desc.text}}
+{{else if modules.module_dynamic.major.article.title}}
+  {{modules.module_dynamic.major.article.title}}
+{{/if}}
+
+转发：{{formatNumber modules.module_stat.forward.count}} | 评论：{{formatNumber modules.module_stat.comment.count}} | 点赞：{{formatNumber modules.module_stat.like.count}}
+https://www.bilibili.com/opus/{{id_str}}`)
       .role('textarea', { rows: [8, 4] })
       .description("返回的文本预设"),
   }).description("动态设置"),
@@ -160,7 +169,7 @@ https://space.bilibili.com/{{module_author.mid}}`)
 
 export function apply(ctx: Context, config: Config) {
   ctx.middleware(async (session, next) => {
-    const retMsg = type_processer(session, ctx, config)
+    const retMsg = link_parser(session, ctx, config)
 
     if (await retMsg !== "" || await retMsg !== null) {
       return retMsg

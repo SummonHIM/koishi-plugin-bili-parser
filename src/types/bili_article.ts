@@ -1,6 +1,6 @@
 import type { Context } from "koishi"
 import Handlebars from 'handlebars'
-import type { Config } from ".."
+import { type Config, logger } from ".."
 
 export class Bili_Article {
   private ctx: Context
@@ -34,15 +34,16 @@ export class Bili_Article {
    * @param id 专栏 ID
    * @returns 文字专栏信息
    */
-  async gen_context(id: string) {
+  async gen_context(id: string, config: Config) {
     const info = await this.fetch_article_info(id)
     if (info.code !== 0) throw (`Fetching article api failed. Code: ${info.code}`)
 
     Handlebars.registerHelper('getArticleID', () => {
-      return id
+      return id.replace(/^cv/, "")
     })
 
     const template = Handlebars.compile(this.config.bArticleRetPreset)
+    logger.debug("bArticle api return: ", info.data)
     return template(info.data)
   }
 }

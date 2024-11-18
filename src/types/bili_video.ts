@@ -1,6 +1,6 @@
 import type { Context, Dict } from "koishi"
 import Handlebars from 'handlebars'
-import type { Config } from ".."
+import { type Config, logger } from ".."
 
 export class Bili_Video {
   private ctx: Context
@@ -78,11 +78,12 @@ export class Bili_Video {
    * @param id 视频 ID
    * @returns 文字视频信息
    */
-  async gen_context(id: string) {
+  async gen_context(id: string, config: Config) {
     const info = await this.fetch_video_info(id)
     if (info.code !== 0) throw (`Fetching video api failed. Code: ${info.code}`)
 
     const template = Handlebars.compile(this.config.bVideoRetPreset)
+    logger.debug("bVideo api return: ", info.data)
     return template(info.data)
   }
 }
