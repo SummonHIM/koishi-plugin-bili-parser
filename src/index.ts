@@ -6,36 +6,44 @@ export const name = "bili-parser"
 export const logger = new Logger("bili-parser")
 
 export interface Config {
-  parseLimit: number
   showQuote: boolean
+  parseLimit: number
   customDelimiter: string
   userAgent: string
   cookies: string
 
+  bVideoEnable: boolean
   bVideoFullURL: boolean
   bVideoRetPreset: string
 
+  bLiveEnable: boolean
   bLiveRetPreset: string
 
+  bBangumiEnable: boolean
   bBangumiFullURL: boolean
   bBangumiRetPreset: string
   bEpisodeRetPreset: string
 
+  bArticleEnable: boolean
   bArticleFullURL: boolean
   bArticleRetPreset: string
 
   // bAudioFullURL: boolean
   // bAudioRetPreset: string
 
+  bOpusEnable: boolean
   bOpusRetPreset: string
 
+  bSpaceEnable: boolean
   bSpaceRetPreset: string
+
+  bShortEnable: boolean
 }
 
 export const Config: Schema<Config> = Schema.intersect([
   Schema.object({
-    parseLimit: Schema.number().default(3).description("单对话多链接解析上限"),
     showQuote: Schema.boolean().default(true).description("引用/回复原消息"),
+    parseLimit: Schema.number().default(3).description("单对话多链接解析上限"),
     customDelimiter: Schema.string()
       .default("------")
       .description("自定义分隔符。*当出现多链接时使用的分隔符*"),
@@ -49,6 +57,9 @@ export const Config: Schema<Config> = Schema.intersect([
   }).description("基础设置"),
 
   Schema.object({
+    bVideoEnable: Schema.boolean()
+      .default(true)
+      .description("启用视频链接解析"),
     bVideoFullURL: Schema.boolean()
       .default(true)
       .description(
@@ -68,6 +79,9 @@ https://www.bilibili.com/video/{{bvid}}`)
   }).description("视频设置"),
 
   Schema.object({
+    bLiveEnable: Schema.boolean()
+      .default(true)
+      .description("启用直播链接解析"),
     bLiveRetPreset: Schema.string()
       .default(`[{{formatLiveStatus live_status}}]{{title}}
 <img src=\"{{user_cover}}\" />
@@ -79,6 +93,9 @@ https://live.bilibili.com/{{room_id}}`)
   }).description("直播设置"),
 
   Schema.object({
+    bBangumiEnable: Schema.boolean()
+      .default(true)
+      .description("启用视频链接解析"),
     bBangumiFullURL: Schema.boolean()
       .default(true)
       .description(
@@ -108,6 +125,9 @@ https://www.bilibili.com/bangumi/play/ep{{getCurrentEpisode "ep_id"}}`)
   }).description("番剧集设置"),
 
   Schema.object({
+    bArticleEnable: Schema.boolean()
+      .default(true)
+      .description("启用专栏链接解析"),
     bArticleFullURL: Schema.boolean()
       .default(true)
       .description(
@@ -142,6 +162,9 @@ https://www.bilibili.com/read/cv{{getArticleID}}`)
   //   }).description("歌曲设置"),
 
   Schema.object({
+    bOpusEnable: Schema.boolean()
+      .default(true)
+      .description("启用动态链接解析"),
     bOpusRetPreset: Schema.string()
       .default(`{{modules.module_author.name}}的动态
 <img src=\"{{modules.module_author.face}}\" />
@@ -158,13 +181,22 @@ https://www.bilibili.com/opus/{{id_str}}`)
   }).description("动态设置"),
 
   Schema.object({
+    bSpaceEnable: Schema.boolean()
+      .default(true)
+      .description("启用空间链接解析"),
     bSpaceRetPreset: Schema.string()
-      .default(`{{module_author.name}}
+      .default(`{{module_author.name}} 的个人空间
 <img src=\"{{module_author.face}}\" />
 https://space.bilibili.com/{{module_author.mid}}`)
       .role('textarea', { rows: [8, 4] })
       .description("返回的文本预设"),
-  }).description("控件设置"),
+  }).description("空间设置"),
+
+  Schema.object({
+    bShortEnable: Schema.boolean()
+      .default(true)
+      .description("启用短链接解析"),
+  }).description("短链接设置")
 ])
 
 export function apply(ctx: Context, config: Config) {

@@ -11,8 +11,12 @@ import { Bili_Article } from "./types/bili_article"
 import { Bili_Opus } from "./types/bili_opus"
 import { Bili_Space } from "./types/bili_space"
 
+interface LinkRegex {
+  pattern: RegExp
+  type: string
+}
 
-interface linkType {
+interface LinkType {
   type: string
   id: string
 }
@@ -23,65 +27,78 @@ interface linkType {
  * @param config 插件设置
  * @returns [{type: "链接类型", id :"内容ID"}]
  */
-function link_type_parser(content: string, config: Config): linkType[] {
-  const linkRegex = [
-    {
-      pattern: config.bVideoFullURL
-        ? /bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)/gim
-        : /([ab]v[0-9a-zA-Z]+)/gim,
-      type: "Video",
-    },
-    {
-      pattern: /live\.bilibili\.com(?:\/h5)?\/(\d+)/gim,
-      type: "Live",
-    },
-    {
+function link_type_parser(content: string, config: Config): LinkType[] {
+  const linkRegex: LinkRegex[] = []
+
+  if (config.bVideoEnable) linkRegex.push({
+    pattern: config.bVideoFullURL
+      ? /bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)/gim
+      : /([ab]v[0-9a-zA-Z]+)/gim,
+    type: "Video",
+  })
+
+  if (config.bLiveEnable) linkRegex.push({
+    pattern: /live\.bilibili\.com(?:\/h5)?\/(\d+)/gim,
+    type: "Live",
+  })
+
+  if (config.bBangumiEnable) {
+    linkRegex.push({
       pattern: config.bBangumiFullURL
         ? /bilibili\.com\/bangumi\/play\/((ep|ss)(\d+))/gim
         : /((ep|ss)(\d+))/gim,
       type: "Bangumi",
-    },
-    {
+    })
+    linkRegex.push({
       pattern: config.bBangumiFullURL
         ? /bilibili\.com\/bangumi\/media\/(md(\d+))/gim
         : /(md(\d+))/gim,
       type: "Bangumi",
-    },
-    {
+    })
+  }
+
+  if (config.bArticleEnable) {
+    linkRegex.push({
       pattern: config.bArticleFullURL
-        ? /bilibili\.com\/read\/(cv(\d+))/gim
-        : /(cv(\d+))/gim,
+        ? /bilibili\.com\/read\/cv(\d+)/gim
+        : /cv(\d+)/gim,
       type: "Article",
-    },
-    {
+    })
+    linkRegex.push({
       pattern: /bilibili\.com\/read\/mobile(?:\?id=|\/)(\d+)/gim,
       type: "Article",
-    },
-    // {
-    //   pattern: config.bAudioFullURL
-    //     ? /bilibili\.com\/audio\/(au(\d+))/gim
-    //     : /(au(\d+))/gim,
-    //   type: "Audio",
-    // },
-    {
-      pattern: /bilibili\.com\/opus\/(\d+)/gim,
-      type: "Opus",
-    },
-    {
-      pattern: /space\.bilibili\.com\/(\d+)/gim,
-      type: "Space",
-    },
-    {
+    })
+  }
+
+  // {
+  //   pattern: config.bAudioFullURL
+  //     ? /bilibili\.com\/audio\/(au(\d+))/gim
+  //     : /(au(\d+))/gim,
+  //   type: "Audio",
+  // },
+
+  if (config.bOpusEnable) linkRegex.push({
+    pattern: /bilibili\.com\/opus\/(\d+)/gim,
+    type: "Opus",
+  })
+
+  if (config.bSpaceEnable) linkRegex.push({
+    pattern: /space\.bilibili\.com\/(\d+)/gim,
+    type: "Space",
+  })
+
+  if (config.bShortEnable) {
+    linkRegex.push({
       pattern: /b23\.tv(?:\\)?\/([0-9a-zA-Z]+)/gim,
       type: "Short",
-    },
-    {
+    })
+    linkRegex.push({
       pattern: /bili(?:22|23|33)\.cn\/([0-9a-zA-Z]+)/gim,
       type: "Short",
-    },
-  ]
+    })
+  }
 
-  const results: linkType[] = []
+  const results: LinkType[] = []
 
   // biome-ignore lint/complexity/noForEach: <explanation>
   linkRegex.forEach(({ pattern, type }) => {
@@ -95,8 +112,14 @@ function link_type_parser(content: string, config: Config): linkType[] {
     }
   })
 
-  logger.debug("Links: ", results)
-  return results
+  // 去重
+  const ret = results.filter(
+    (item, index, self) =>
+      index === self.findIndex(t => t.type === item.type && t.id === item.id)
+  )
+
+  logger.debug("Links: ", ret)
+  return ret
 }
 
 /**
@@ -106,12 +129,13 @@ function link_type_parser(content: string, config: Config): linkType[] {
  * @param config Config
  * @returns 解析来的文本
  */
-async function type_parser(links: linkType[], ctx: Context, config: Config) {
+async function type_parser(links: LinkType[], ctx: Context, config: Config) {
   let ret = ""
   let countLink = 0
 
   for (const link of links) {
-    if (countLink >= 1) ret += `\n${config.customDelimiter}\n`
+    let context = ""
+
     if (countLink >= config.parseLimit) {
       ret += "已达到解析上限…"
       break
@@ -121,28 +145,28 @@ async function type_parser(links: linkType[], ctx: Context, config: Config) {
       case "Video": {
         const bili_video = new Bili_Video(ctx, config)
         const video_info = await bili_video.gen_context(link.id, config)
-        if (video_info != null) ret += video_info
+        if (video_info != null) context += video_info
         break
       }
 
       case "Live": {
         const bili_live = new Bili_Live(ctx, config)
         const live_info = await bili_live.gen_context(link.id, config)
-        if (live_info != null) ret += live_info
+        if (live_info != null) context += live_info
         break
       }
 
       case "Bangumi": {
         const bili_bangumi = new Bili_Bangumi(ctx, config)
         const bangumi_info = await bili_bangumi.gen_context(link.id, config)
-        if (bangumi_info != null) ret += bangumi_info
+        if (bangumi_info != null) context += bangumi_info
         break
       }
 
       case "Article": {
         const bili_article = new Bili_Article(ctx, config)
         const article_info = await bili_article.gen_context(link.id, config)
-        if (article_info != null) ret += article_info
+        if (article_info != null) context += article_info
         break
       }
 
@@ -156,14 +180,14 @@ async function type_parser(links: linkType[], ctx: Context, config: Config) {
       case "Opus": {
         const bili_opus = new Bili_Opus(ctx, config)
         const opus_info = await bili_opus.gen_context(link.id, config)
-        if (opus_info != null) ret += opus_info
+        if (opus_info != null) context += opus_info
         break
       }
 
       case "Space": {
         const bili_space = new Bili_Space(ctx, config)
         const space_info = await bili_space.gen_context(link.id, config)
-        if (space_info != null) ret += space_info
+        if (space_info != null) context += space_info
         break
       }
 
@@ -171,10 +195,13 @@ async function type_parser(links: linkType[], ctx: Context, config: Config) {
         const bili_short = new Bili_Short(ctx, config)
         const links = link_type_parser(await bili_short.get_redir_url(link.id), config)
         const final_info = await type_parser(links, ctx, config)
-        if (final_info !== null) ret += final_info
+        if (final_info !== null) context += final_info
         break
       }
     }
+
+    if (context !== "" && countLink >= 1) ret += `\n${config.customDelimiter}\n`
+    if (context !== "") ret += context
 
     countLink++
   }
@@ -204,7 +231,7 @@ export default async function link_parser(
 
   Handlebars.registerHelper('truncate', (text, length) => {
     if (typeof text !== "string") {
-      return ""
+      return text
     }
 
     if (text.length > length) {
@@ -217,7 +244,9 @@ export default async function link_parser(
 
   let ret = config.showQuote ? `${[h("quote", { id: session.messageId })]}\n` : ""
 
-  ret += await type_parser(links, ctx, config)
+  const tpRet = await type_parser(links, ctx, config)
+  if (tpRet === "") return null
+  ret += tpRet
 
   logger.debug("Generated message: ", ret)
   return ret
