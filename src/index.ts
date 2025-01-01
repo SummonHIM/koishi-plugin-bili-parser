@@ -203,7 +203,7 @@ export function apply(ctx: Context, config: Config) {
   ctx.middleware(async (session, next) => {
     const retMsg = link_parser(session, ctx, config)
 
-    if (await retMsg !== "" || await retMsg !== null) {
+    if (await retMsg !== "" && await retMsg !== null) {
       return retMsg
     }
     return next()
