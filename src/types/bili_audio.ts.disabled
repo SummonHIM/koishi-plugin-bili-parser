@@ -36,7 +36,13 @@ export class Bili_Audio {
    */
   async gen_context(id: string) {
     const info = await this.fetch_audio_info(id)
-    if (info.code !== 0) throw (`Fetching audio api failed. Code: ${info.code}`)
+
+    switch (info.code) {
+      case -404:
+        return "音乐不存在"
+      default:
+        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`
+    }
 
     const template = Handlebars.compile(this.config.bAudioRetPreset)
     return template(info.data)

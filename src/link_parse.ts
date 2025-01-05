@@ -1,6 +1,6 @@
 import { type Context, type Session, h } from "koishi"
-import numbro from 'numbro'
-import Handlebars from 'handlebars'
+import numbro from "numbro"
+import Handlebars from "handlebars"
 import { type Config, logger } from "."
 import { Bili_Video } from "./types/bili_video"
 import { Bili_Short } from "./types/bili_short"
@@ -30,17 +30,19 @@ interface LinkType {
 function link_type_parser(content: string, config: Config): LinkType[] {
   const linkRegex: LinkRegex[] = []
 
-  if (config.bVideoEnable) linkRegex.push({
-    pattern: config.bVideoFullURL
-      ? /bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)/gim
-      : /([ab]v[0-9a-zA-Z]+)/gim,
-    type: "Video",
-  })
+  if (config.bVideoEnable)
+    linkRegex.push({
+      pattern: config.bVideoFullURL
+        ? /bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)/gim
+        : /([ab]v[0-9a-zA-Z]+)/gim,
+      type: "Video",
+    })
 
-  if (config.bLiveEnable) linkRegex.push({
-    pattern: /live\.bilibili\.com(?:\/h5)?\/(\d+)/gim,
-    type: "Live",
-  })
+  if (config.bLiveEnable)
+    linkRegex.push({
+      pattern: /live\.bilibili\.com(?:\/h5)?\/(\d+)/gim,
+      type: "Live",
+    })
 
   if (config.bBangumiEnable) {
     linkRegex.push({
@@ -77,15 +79,17 @@ function link_type_parser(content: string, config: Config): LinkType[] {
   //   type: "Audio",
   // },
 
-  if (config.bOpusEnable) linkRegex.push({
-    pattern: /bilibili\.com\/opus\/(\d+)/gim,
-    type: "Opus",
-  })
+  if (config.bOpusEnable)
+    linkRegex.push({
+      pattern: /bilibili\.com\/opus\/(\d+)/gim,
+      type: "Opus",
+    })
 
-  if (config.bSpaceEnable) linkRegex.push({
-    pattern: /space\.bilibili\.com\/(\d+)/gim,
-    type: "Space",
-  })
+  if (config.bSpaceEnable)
+    linkRegex.push({
+      pattern: /space\.bilibili\.com\/(\d+)/gim,
+      type: "Space",
+    })
 
   if (config.bShortEnable) {
     linkRegex.push({
@@ -100,7 +104,6 @@ function link_type_parser(content: string, config: Config): LinkType[] {
 
   const results: LinkType[] = []
 
-  // biome-ignore lint/complexity/noForEach: <explanation>
   linkRegex.forEach(({ pattern, type }) => {
     const matches = content.matchAll(pattern)
 
@@ -115,7 +118,7 @@ function link_type_parser(content: string, config: Config): LinkType[] {
   // 去重
   const ret = results.filter(
     (item, index, self) =>
-      index === self.findIndex(t => t.type === item.type && t.id === item.id)
+      index === self.findIndex((t) => t.type === item.type && t.id === item.id)
   )
 
   logger.debug("Links: ", ret)
@@ -193,14 +196,20 @@ async function type_parser(links: LinkType[], ctx: Context, config: Config) {
 
       case "Short": {
         const bili_short = new Bili_Short(ctx, config)
-        const links = link_type_parser(await bili_short.get_redir_url(link.id), config)
+        const redir_url = await bili_short.get_redir_url(link.id)
+        if (redir_url === null) {
+          context += "短链接不正确。"
+          break
+        }
+        const links = link_type_parser(redir_url, config)
         const final_info = await type_parser(links, ctx, config)
         if (final_info !== null) context += final_info
         break
       }
     }
 
-    if (context !== "" && countLink >= 1) ret += `\n${config.customDelimiter}\n`
+    if (context !== "" && countLink >= 1)
+      ret += `\n${config.customDelimiter}\n`
     if (context !== "") ret += context
 
     countLink++
@@ -219,17 +228,21 @@ async function type_parser(links: LinkType[], ctx: Context, config: Config) {
 export default async function link_parser(
   session: Session,
   ctx: Context,
-  config: Config,
+  config: Config
 ) {
   const links = link_type_parser(session.content, config)
 
   if (links.length === 0) return null
 
-  Handlebars.registerHelper('formatNumber', (value: number) => {
-    return numbro(value).format({ average: true, mantissa: 1, optionalMantissa: true })
+  Handlebars.registerHelper("formatNumber", (value: number) => {
+    return numbro(value).format({
+      average: true,
+      mantissa: 1,
+      optionalMantissa: true,
+    })
   })
 
-  Handlebars.registerHelper('truncate', (text, length) => {
+  Handlebars.registerHelper("truncate", (text, length) => {
     if (typeof text !== "string") {
       return text
     }
@@ -241,13 +254,14 @@ export default async function link_parser(
     return text
   })
 
-
-  let ret = config.showQuote ? `${[h("quote", { id: session.messageId })]}\n` : ""
+  let ret = config.showQuote
+    ? `${[h("quote", { id: session.messageId })]}\n`
+    : ""
 
   const tpRet = await type_parser(links, ctx, config)
   if (tpRet === "") return null
   ret += tpRet
 
-  logger.debug("Generated message: ", ret)
+  logger.debug(`Generated message: ${ret}`)
   return ret
 }

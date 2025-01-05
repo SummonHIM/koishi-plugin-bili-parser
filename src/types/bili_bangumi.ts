@@ -117,7 +117,12 @@ export class Bili_Bangumi {
     const vid = this.bgm_type_parse(id)
     const info = await this.fetch_video_info(vid.type, vid.id)
 
-    if (info.code !== 0) throw (`Fetching bangumi api failed. Code: ${info.code}`)
+    switch (info.code) {
+      case -404:
+        return "番剧不存在"
+      default:
+        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`
+    }
 
     let ret = null
 
@@ -127,8 +132,6 @@ export class Bili_Bangumi {
         const epIndex = episodes.findIndex(
           (episode: Dict) => Number(episode.ep_id) === Number(vid.id)
         )
-
-
 
         Handlebars.registerHelper('getCurrentEpisode', (key: string) => {
           return episodes[epIndex][key]

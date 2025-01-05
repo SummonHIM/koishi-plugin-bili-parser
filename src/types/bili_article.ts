@@ -36,7 +36,13 @@ export class Bili_Article {
    */
   async gen_context(id: string, config: Config) {
     const info = await this.fetch_article_info(id)
-    if (info.code !== 0) throw (`Fetching article api failed. Code: ${info.code}`)
+
+    switch (info.code) {
+      case -404:
+        return "文章不存在"
+      default:
+        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`
+    }
 
     Handlebars.registerHelper('getArticleID', () => {
       return id.replace(/^cv/, "")

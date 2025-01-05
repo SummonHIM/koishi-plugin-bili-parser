@@ -1,5 +1,5 @@
 import type { Context } from "koishi"
-import Handlebars from 'handlebars'
+import Handlebars from "handlebars"
 import { type Config, logger } from ".."
 
 export class Bili_Space {
@@ -22,8 +22,8 @@ export class Bili_Space {
       {
         headers: {
           "User-Agent": this.config.userAgent,
-          "Cookie": this.config.cookies
-        }
+          Cookie: this.config.cookies,
+        },
       }
     )
     return ret
@@ -37,7 +37,12 @@ export class Bili_Space {
   async gen_context(id: string, config: Config) {
     const info = await this.fetch_space_info(id)
 
-    if (info.code !== 0) throw (`Fetching space api failed. Code: ${info.code}`)
+    switch (info.code) {
+      case -404:
+        return "空间不存在"
+      default:
+        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`
+    }
 
     const template = Handlebars.compile(this.config.bSpaceRetPreset)
     logger.debug("bSpace api return: ", info.data.items[0].modules)

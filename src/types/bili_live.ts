@@ -1,5 +1,5 @@
 import type { Context } from "koishi"
-import Handlebars from 'handlebars'
+import Handlebars from "handlebars"
 import { type Config, logger } from ".."
 
 export class Bili_Live {
@@ -40,8 +40,8 @@ export class Bili_Live {
       {
         headers: {
           "User-Agent": this.config.userAgent,
-          "Cookie": this.config.cookies
-        }
+          Cookie: this.config.cookies,
+        },
       }
     )
     return ret
@@ -54,9 +54,15 @@ export class Bili_Live {
    */
   async gen_context(id: string, config: Config) {
     const info = await this.fetch_video_info(id)
-    if (info.code !== 0) throw (`Fetching live api failed. Code: ${info.code}`)
 
-    Handlebars.registerHelper('formatLiveStatus', (value: number) => {
+    switch (info.code) {
+      case -404:
+        return "直播不存在"
+      default:
+        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`
+    }
+
+    Handlebars.registerHelper("formatLiveStatus", (value: number) => {
       return this.getStatusText(value)
     })
     const template = Handlebars.compile(this.config.bLiveRetPreset)

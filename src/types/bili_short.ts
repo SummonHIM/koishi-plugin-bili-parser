@@ -23,8 +23,12 @@ export class Bili_Short {
       },
     })
 
-    const match = data.match(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"/i)
-    if (match) return match[1]
-    return null
+    try {
+      const match = data.match(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"/i)
+      return match[1]
+    } catch (error) {
+      return null
+    }
+    
   }
 }
