@@ -5,10 +5,12 @@ name: Publish Node.js Package
 
 on:
   push:
-    tags: ["*"]
+    branches: ["*"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
-  publish-npm:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -18,22 +20,7 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-      - name: Validate release tag
-        run: |
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          TAG=${GITHUB_REF_NAME#v}
-
-          if [ "$TAG" != "$PACKAGE_VERSION" ]; then
-            echo "Release tag ($TAG) does not match package.json version ($PACKAGE_VERSION)"
-            exit 1
-          else
-            echo "Release tag matches package.json version."
-          fi
       - name: Install node modules
-        run: npm ci
+        run: npm install
       - name: Build project
         run: npm run build
-      - name: Publish built files
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

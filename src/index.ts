@@ -172,7 +172,7 @@ https://www.bilibili.com/audio/au{{id}}`
 UP主：{{uname}}
 {{intro}}
 播放：{{formatNumber statistic.play}} | 收藏：{{formatNumber statistic.collect}} | 转发：{{formatNumber statistic.share}}
-https://www.bilibili.com/audio/au{{id}}`
+https://www.bilibili.com/audio/am{{menuId}}`
       )
       .role("textarea", { rows: [8, 4] })
       .description("返回的歌单文本预设"),

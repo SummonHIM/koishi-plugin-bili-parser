@@ -1,6 +1,7 @@
 # @summonhim/koishi-plugin-bili-parser
 
-[![npm](https://img.shields.io/npm/v/@summonhim/koishi-plugin-bili-parser?style=flat-square)](https://www.npmjs.com/package/@summonhim/koishi-plugin-bili-parser)
+[![npm](https://img.shields.io/npm/v/@summonhim/koishi-plugin-bili-parser?style=flat-square)](https://www.npmjs.com/package/@summonhim/koishi-plugin-bili-parser) [![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?style=flat-square&logo=typescript&logoColor=fff)](https://www.typescriptlang.org/) [![Koishi](https://img.shields.io/badge/Koishi-5546a3?style=flat-square&logo=typescript&logoColor=fff)
+](https://koishi.chat/)
 
 A koishi plugin use to parse bilibili links.
 
@@ -82,8 +83,32 @@ https://www.bilibili.com/read/{{getArticleID}}
 ```
 
 ### Audio/音乐
+When regex match `bilibili\.com\/audio\/au(\d+)`, reply
 
-由于音乐 API 已被加密。所以暂时禁用该 API。
+当正则表达式符合 `bilibili\.com\/audio\/au(\d+)`，回复
+
+```
+{{title}}
+<img src=\"{{cover}}\" />
+UP主：{{uname}}\t\t歌手：{{author}}
+播放：{{formatNumber statistic.play}}\t\t投币：{{formatNumber coin_num}}
+收藏：{{formatNumber statistic.collect}}\t\t转发：{{formatNumber statistic.share}}
+https://www.bilibili.com/audio/au{{id}}
+```
+
+### Audio Menu/歌单
+When regex match `bilibili\.com\/audio\/am(\d+)`, reply
+
+当正则表达式符合 `bilibili\.com\/audio\/am(\d+)`，回复
+
+```
+{{title}}
+<img src=\"{{cover}}\" />
+UP主：{{uname}}
+{{intro}}
+播放：{{formatNumber statistic.play}} | 收藏：{{formatNumber statistic.collect}} | 转发：{{formatNumber statistic.share}}
+https://www.bilibili.com/audio/am{{menuId}}
+```
 
 ### Opus/动态
 When regex match `bilibili\.com\/opus\/(\d+)`, reply
