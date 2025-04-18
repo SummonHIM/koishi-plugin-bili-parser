@@ -1,13 +1,13 @@
-import type { Context } from "koishi"
-import type { Config } from ".."
+import type { Context } from "koishi";
+import type { Config } from "..";
 
 export class Bili_Short {
-  private ctx: Context
-  private config: Config
+  private ctx: Context;
+  private config: Config;
 
   constructor(ctx: Context, config: Config) {
-    this.ctx = ctx
-    this.config = config
+    this.ctx = ctx;
+    this.config = config;
   }
 
   /**
@@ -21,14 +21,13 @@ export class Bili_Short {
       headers: {
         "User-Agent": this.config.userAgent,
       },
-    })
+    });
 
     try {
-      const match = data.match(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"/i)
-      return match[1]
+      const match = data.match(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"/i);
+      return match[1];
     } catch (error) {
-      return null
+      return null;
     }
-    
   }
 }

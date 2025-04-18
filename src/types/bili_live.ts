@@ -1,14 +1,14 @@
-import type { Context } from "koishi"
-import Handlebars from "handlebars"
-import { type Config, logger } from ".."
+import type { Context } from "koishi";
+import Handlebars from "handlebars";
+import { type Config, logger } from "..";
 
 export class Bili_Live {
-  private ctx: Context
-  private config: Config
+  private ctx: Context;
+  private config: Config;
 
   constructor(ctx: Context, config: Config) {
-    this.ctx = ctx
-    this.config = config
+    this.ctx = ctx;
+    this.config = config;
   }
 
   /**
@@ -19,13 +19,13 @@ export class Bili_Live {
   private getStatusText(statusCode: number) {
     switch (statusCode) {
       case 0:
-        return "未开播"
+        return "未开播";
       case 1:
-        return "直播中"
+        return "直播中";
       case 2:
-        return "轮播中"
+        return "轮播中";
       default:
-        return "未知状态"
+        return "未知状态";
     }
   }
 
@@ -43,8 +43,8 @@ export class Bili_Live {
           Cookie: this.config.cookies,
         },
       }
-    )
-    return ret
+    );
+    return ret;
   }
 
   /**
@@ -53,20 +53,20 @@ export class Bili_Live {
    * @returns 文字直播信息
    */
   async gen_context(id: string, config: Config) {
-    const info = await this.fetch_video_info(id)
+    const info = await this.fetch_video_info(id);
 
     switch (info.code) {
       case -404:
-        return "直播不存在"
+        return "直播不存在";
       default:
-        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`
+        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`;
     }
 
     Handlebars.registerHelper("formatLiveStatus", (value: number) => {
-      return this.getStatusText(value)
-    })
-    const template = Handlebars.compile(this.config.bLiveRetPreset)
-    logger.debug("bLive api return: ", info.data)
-    return template(info.data)
+      return this.getStatusText(value);
+    });
+    const template = Handlebars.compile(this.config.bLiveRetPreset);
+    logger.debug("bLive api return: ", info.data);
+    return template(info.data);
   }
 }

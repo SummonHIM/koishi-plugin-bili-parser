@@ -1,14 +1,14 @@
-import type { Context, Dict } from "koishi"
-import Handlebars from 'handlebars'
-import { type Config, logger } from ".."
+import type { Context, Dict } from "koishi";
+import Handlebars from "handlebars";
+import { type Config, logger } from "..";
 
 export class Bili_Bangumi {
-  private ctx: Context
-  private config: Config
+  private ctx: Context;
+  private config: Config;
 
   constructor(ctx: Context, config: Config) {
-    this.ctx = ctx
-    this.config = config
+    this.ctx = ctx;
+    this.config = config;
   }
 
   /**
@@ -30,24 +30,24 @@ export class Bili_Bangumi {
         pattern: /md([0-9]+)/i,
         type: "md",
       },
-    ]
+    ];
 
     let ret = {
       type: null,
       id: null,
-    }
+    };
 
     for (const rule of idRegex) {
-      const match = id.match(rule.pattern)
+      const match = id.match(rule.pattern);
       if (match) {
         ret = {
           type: rule.type,
           id: match[1],
-        }
+        };
       }
     }
 
-    return ret
+    return ret;
   }
 
   /**
@@ -56,7 +56,7 @@ export class Bili_Bangumi {
    * @returns 番剧信息 Json
    */
   async fetch_video_info(type: string, id: string) {
-    let ret: Dict
+    let ret: Dict;
     switch (type) {
       case "ep":
         ret = await this.ctx.http.get(
@@ -64,48 +64,48 @@ export class Bili_Bangumi {
           {
             headers: {
               "User-Agent": this.config.userAgent,
-              "Cookie": this.config.cookies
-            }
+              Cookie: this.config.cookies,
+            },
           }
-        )
-        break
+        );
+        break;
       case "ss":
         ret = await this.ctx.http.get(
           `https://api.bilibili.com/pgc/view/web/season?season_id=${id}`,
           {
             headers: {
               "User-Agent": this.config.userAgent,
-              "Cookie": this.config.cookies
-            }
+              Cookie: this.config.cookies,
+            },
           }
-        )
-        break
+        );
+        break;
       case "md": {
         const mdInfo = await this.ctx.http.get(
           `https://api.bilibili.com/pgc/review/user?media_id=${id}`,
           {
             headers: {
               "User-Agent": this.config.userAgent,
-              "Cookie": this.config.cookies
-            }
+              Cookie: this.config.cookies,
+            },
           }
-        )
+        );
         ret = await this.ctx.http.get(
           `https://api.bilibili.com/pgc/view/web/season?season_id=${mdInfo.result.media.season_id}`,
           {
             headers: {
               "User-Agent": this.config.userAgent,
-              "Cookie": this.config.cookies
-            }
+              Cookie: this.config.cookies,
+            },
           }
-        )
-        break
+        );
+        break;
       }
       default:
-        ret = null
-        break
+        ret = null;
+        break;
     }
-    return ret
+    return ret;
   }
 
   /**
@@ -114,43 +114,43 @@ export class Bili_Bangumi {
    * @returns 文字番剧信息
    */
   async gen_context(id: string, config: Config) {
-    const vid = this.bgm_type_parse(id)
-    const info = await this.fetch_video_info(vid.type, vid.id)
+    const vid = this.bgm_type_parse(id);
+    const info = await this.fetch_video_info(vid.type, vid.id);
 
     switch (info.code) {
       case -404:
-        return "番剧不存在"
+        return "番剧不存在";
       default:
-        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`
+        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`;
     }
 
-    let ret = null
+    let ret = null;
 
     switch (vid.type) {
       case "ep": {
-        const episodes = info.result.episodes
+        const episodes = info.result.episodes;
         const epIndex = episodes.findIndex(
           (episode: Dict) => Number(episode.ep_id) === Number(vid.id)
-        )
+        );
 
-        Handlebars.registerHelper('getCurrentEpisode', (key: string) => {
-          return episodes[epIndex][key]
-        })
+        Handlebars.registerHelper("getCurrentEpisode", (key: string) => {
+          return episodes[epIndex][key];
+        });
 
-        const template = Handlebars.compile(this.config.bEpisodeRetPreset)
-        ret = template(info.result)
-        break
+        const template = Handlebars.compile(this.config.bEpisodeRetPreset);
+        ret = template(info.result);
+        break;
       }
 
       case "ss":
       case "md": {
-        const template = Handlebars.compile(this.config.bBangumiRetPreset)
-        ret = template(info.result)
-        break
+        const template = Handlebars.compile(this.config.bBangumiRetPreset);
+        ret = template(info.result);
+        break;
       }
     }
 
-    logger.debug("bBangumi api return: ", info.result)
-    return ret
+    logger.debug("bBangumi api return: ", info.result);
+    return ret;
   }
 }

@@ -1,14 +1,14 @@
-import type { Context } from "koishi"
-import Handlebars from "handlebars"
-import { type Config, logger } from ".."
+import type { Context } from "koishi";
+import Handlebars from "handlebars";
+import { type Config, logger } from "..";
 
 export class Bili_Space {
-  private ctx: Context
-  private config: Config
+  private ctx: Context;
+  private config: Config;
 
   constructor(ctx: Context, config: Config) {
-    this.ctx = ctx
-    this.config = config
+    this.ctx = ctx;
+    this.config = config;
   }
 
   /**
@@ -25,8 +25,8 @@ export class Bili_Space {
           Cookie: this.config.cookies,
         },
       }
-    )
-    return ret
+    );
+    return ret;
   }
 
   /**
@@ -35,17 +35,17 @@ export class Bili_Space {
    * @returns 文字用户信息
    */
   async gen_context(id: string, config: Config) {
-    const info = await this.fetch_space_info(id)
+    const info = await this.fetch_space_info(id);
 
     switch (info.code) {
       case -404:
-        return "空间不存在"
+        return "空间不存在";
       default:
-        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`
+        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`;
     }
 
-    const template = Handlebars.compile(this.config.bSpaceRetPreset)
-    logger.debug("bSpace api return: ", info.data.items[0].modules)
-    return template(info.data.items[0].modules)
+    const template = Handlebars.compile(this.config.bSpaceRetPreset);
+    logger.debug("bSpace api return: ", info.data.items[0].modules);
+    return template(info.data.items[0].modules);
   }
 }

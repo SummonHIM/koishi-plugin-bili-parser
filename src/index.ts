@@ -1,43 +1,45 @@
-import { type Context, Logger, Schema } from "koishi"
-import link_parser from "./link_parse"
+import { type Context, h, Logger, Schema } from "koishi";
+import link_parser from "./link_parse";
 
-export const name = "bili-parser"
+export const name = "bili-parser";
 
-export const logger = new Logger("bili-parser")
+export const logger = new Logger("bili-parser");
 
 export interface Config {
-  showQuote: boolean
-  parseLimit: number
-  customDelimiter: string
-  userAgent: string
-  cookies: string
+  showQuote: boolean;
+  parseLimit: number;
+  customDelimiter: string;
+  userAgent: string;
+  cookies: string;
 
-  bVideoEnable: boolean
-  bVideoFullURL: boolean
-  bVideoRetPreset: string
+  bVideoEnable: boolean;
+  bVideoFullURL: boolean;
+  bVideoRetPreset: string;
 
-  bLiveEnable: boolean
-  bLiveRetPreset: string
+  bLiveEnable: boolean;
+  bLiveRetPreset: string;
 
-  bBangumiEnable: boolean
-  bBangumiFullURL: boolean
-  bBangumiRetPreset: string
-  bEpisodeRetPreset: string
+  bBangumiEnable: boolean;
+  bBangumiFullURL: boolean;
+  bBangumiRetPreset: string;
+  bEpisodeRetPreset: string;
 
-  bArticleEnable: boolean
-  bArticleFullURL: boolean
-  bArticleRetPreset: string
+  bArticleEnable: boolean;
+  bArticleFullURL: boolean;
+  bArticleRetPreset: string;
 
-  // bAudioFullURL: boolean
-  // bAudioRetPreset: string
+  bAudioEnable: boolean;
+  bAudioFullURL: boolean;
+  bAudioRetPreset: string;
+  bAudioMenuRetPreset: string;
 
-  bOpusEnable: boolean
-  bOpusRetPreset: string
+  bOpusEnable: boolean;
+  bOpusRetPreset: string;
 
-  bSpaceEnable: boolean
-  bSpaceRetPreset: string
+  bSpaceEnable: boolean;
+  bSpaceRetPreset: string;
 
-  bShortEnable: boolean
+  bShortEnable: boolean;
 }
 
 export const Config: Schema<Config> = Schema.intersect([
@@ -145,22 +147,36 @@ https://www.bilibili.com/read/cv{{getArticleID}}`
       .description("返回的文本预设"),
   }).description("专栏设置"),
 
-  //   Schema.object({
-  //     bAudioFullURL: Schema.boolean()
-  //       .default(true)
-  //       .description(
-  //         "需要完整链接 *（若关闭，则仅需 AU 号即可解析）*"
-  //       ),
-  //     bAudioRetPreset: Schema.string()
-  //       .default(`{{title}}
-  // <img src=\"{{cover}}\" />
-  // UP主：{{uname}}\t\t歌手：{{author}}
-  // 播放：{{formatNumber statistic.play}}\t\t投币：{{formatNumber coin_num}}
-  // 收藏：{{formatNumber statistic.collect}}\t\t转发：{{formatNumber statistic.share}}
-  // https://www.bilibili.com/audio/au{{id}}`)
-  //       .role('textarea', { rows: [8, 4] })
-  //       .description("返回的文本预设"),
-  //   }).description("歌曲设置"),
+  Schema.object({
+    bAudioEnable: Schema.boolean()
+      .default(true)
+      .description("启用音乐链接解析"),
+    bAudioFullURL: Schema.boolean()
+      .default(true)
+      .description("需要完整链接 *（若关闭，则仅需 AU 号即可解析）*"),
+    bAudioRetPreset: Schema.string()
+      .default(
+        `{{title}}
+<img src=\"{{cover}}\" />
+UP主：{{uname}}\t\t歌手：{{author}}
+播放：{{formatNumber statistic.play}}\t\t投币：{{formatNumber coin_num}}
+收藏：{{formatNumber statistic.collect}}\t\t转发：{{formatNumber statistic.share}}
+https://www.bilibili.com/audio/au{{id}}`
+      )
+      .role("textarea", { rows: [8, 4] })
+      .description("返回的单曲文本预设"),
+    bAudioMenuRetPreset: Schema.string()
+      .default(
+        `{{title}}
+<img src=\"{{cover}}\" />
+UP主：{{uname}}
+{{intro}}
+播放：{{formatNumber statistic.play}} | 收藏：{{formatNumber statistic.collect}} | 转发：{{formatNumber statistic.share}}
+https://www.bilibili.com/audio/au{{id}}`
+      )
+      .role("textarea", { rows: [8, 4] })
+      .description("返回的歌单文本预设"),
+  }).description("音乐设置"),
 
   Schema.object({
     bOpusEnable: Schema.boolean().default(true).description("启用动态链接解析"),
@@ -198,17 +214,26 @@ https://space.bilibili.com/{{module_author.mid}}`
   Schema.object({
     bShortEnable: Schema.boolean().default(true).description("启用短链接解析"),
   }).description("短链接设置"),
-])
+]);
 
 export function apply(ctx: Context, config: Config) {
   ctx.middleware(async (session, next) => {
-    const retMsg = await link_parser(session, ctx, config)
+    logger.debug(`Inbound message: ${session.content}`);
 
-    if (retMsg !== null) {
-      return retMsg
+    let retMsg: string;
+    const replayStr: string = config.showQuote
+      ? `${[h("quote", { id: session.messageId })]}\n`
+      : "";
+
+    retMsg = await link_parser(session, ctx, config);
+
+    if (retMsg) {
+      retMsg = `${replayStr}${retMsg}`;
+      logger.debug(`Generated message: ${retMsg}`);
+      return retMsg;
     }
 
-    logger.debug("No message, next.")
-    return next()
-  })
+    logger.debug("No message, next.");
+    return next();
+  });
 }

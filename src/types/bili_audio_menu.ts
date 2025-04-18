@@ -2,7 +2,7 @@ import type { Context } from "koishi";
 import Handlebars from "handlebars";
 import { type Config, logger } from "..";
 
-export class Bili_Opus {
+export class Bili_AudioMenu {
   private ctx: Context;
   private config: Config;
 
@@ -12,13 +12,13 @@ export class Bili_Opus {
   }
 
   /**
-   * 根据动态 ID 查找动态信息
-   * @param id 动态 ID
-   * @returns 动态信息 Json
+   * 根据音乐 ID 查找音乐信息
+   * @param id 音乐 ID
+   * @returns 音乐信息 Json
    */
-  async fetch_article_info(id: string) {
+  async fetch_menu_info(id: string) {
     const ret = await this.ctx.http.get(
-      `https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=${id}`,
+      `https://www.bilibili.com/audio/music-service-c/web/menu/info?sid=${id}`,
       {
         headers: {
           "User-Agent": this.config.userAgent,
@@ -30,22 +30,22 @@ export class Bili_Opus {
   }
 
   /**
-   * 生成动态信息
-   * @param id 动态 ID
-   * @returns 文字动态信息
+   * 生成音乐信息
+   * @param id 音乐 ID
+   * @returns 文字音乐信息
    */
-  async gen_context(id: string, config: Config) {
-    const info = await this.fetch_article_info(id);
+  async gen_context(id: string) {
+    const info = await this.fetch_menu_info(id);
 
     switch (info.code) {
       case -404:
-        return "动态不存在";
+        return "音乐不存在";
       default:
         if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`;
     }
 
-    const template = Handlebars.compile(this.config.bOpusRetPreset);
-    logger.debug("bOpus api return: ", info.data.item);
-    return template(info.data.item);
+    const template = Handlebars.compile(this.config.bAudioMenuRetPreset);
+    logger.debug("bAudioMenu api return: ", info.data);
+    return template(info.data);
   }
 }

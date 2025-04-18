@@ -1,14 +1,14 @@
-import type { Context, Dict } from "koishi"
-import Handlebars from "handlebars"
-import { type Config, logger } from ".."
+import type { Context, Dict } from "koishi";
+import Handlebars from "handlebars";
+import { type Config, logger } from "..";
 
 export class Bili_Video {
-  private ctx: Context
-  private config: Config
+  private ctx: Context;
+  private config: Config;
 
   constructor(ctx: Context, config: Config) {
-    this.ctx = ctx
-    this.config = config
+    this.ctx = ctx;
+    this.config = config;
   }
 
   /**
@@ -20,21 +20,21 @@ export class Bili_Video {
     const idRegex = [
       { pattern: /av([0-9]+)/i, type: "av" },
       { pattern: /bv([0-9a-zA-Z]+)/i, type: "bv" },
-    ]
+    ];
 
-    let ret = { type: null, id: null }
+    let ret = { type: null, id: null };
 
     for (const regex of idRegex) {
-      const match = id.match(regex.pattern)
+      const match = id.match(regex.pattern);
       if (match) {
         ret = {
           type: regex.type,
           id: match[1],
-        }
+        };
       }
     }
 
-    return ret
+    return ret;
   }
 
   /**
@@ -43,8 +43,8 @@ export class Bili_Video {
    * @returns 视频信息 Json
    */
   async fetch_video_info(id: string) {
-    let ret: Dict
-    const vid = this.vid_type_parse(id)
+    let ret: Dict;
+    const vid = this.vid_type_parse(id);
     switch (vid.type) {
       case "av":
         ret = await this.ctx.http.get(
@@ -55,8 +55,8 @@ export class Bili_Video {
               Cookie: this.config.cookies,
             },
           }
-        )
-        break
+        );
+        break;
       case "bv":
         ret = await this.ctx.http.get(
           `https://api.bilibili.com/x/web-interface/view?bvid=${vid.id}`,
@@ -66,11 +66,11 @@ export class Bili_Video {
               Cookie: this.config.cookies,
             },
           }
-        )
-        break
+        );
+        break;
     }
 
-    return ret
+    return ret;
   }
 
   /**
@@ -79,17 +79,17 @@ export class Bili_Video {
    * @returns 文字视频信息
    */
   async gen_context(id: string, config: Config) {
-    const info = await this.fetch_video_info(id)
+    const info = await this.fetch_video_info(id);
 
     switch (info.code) {
       case -404:
-        return "视频不存在"
+        return "视频不存在";
       default:
-        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`
+        if (info.code !== 0) return `BiliBili 返回错误代码：${info.code}`;
     }
 
-    const template = Handlebars.compile(this.config.bVideoRetPreset)
-    logger.debug("bVideo api return: ", info.data)
-    return template(info.data)
+    const template = Handlebars.compile(this.config.bVideoRetPreset);
+    logger.debug("bVideo api return: ", info.data);
+    return template(info.data);
   }
 }
