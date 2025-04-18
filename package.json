@@ -20,11 +20,13 @@
     "plugin"
   ],
   "peerDependencies": {
-    "@types/handlebars": "^4.1.0",
-    "@types/numbro": "^1.9.3",
     "handlebars": "^4.7.8",
     "koishi": "^4.17.5",
     "numbro": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/handlebars": "^4.1.0",
+    "@types/numbro": "^1.9.3"
   },
   "koishi": {
     "description": {
