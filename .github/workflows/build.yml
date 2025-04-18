@@ -10,7 +10,7 @@ on:
     branches: ["main"]
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -24,3 +24,8 @@ jobs:
         run: npm install
       - name: Build project
         run: npm run build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+            name: lib
+            path: lib
