@@ -164,7 +164,7 @@ async function type_parser(links: LinkType[], ctx: Context, config: Config) {
     let context = "";
 
     if (countLink >= config.parseLimit) {
-      ret += "已达到解析上限…";
+      ret += "\n\n已达到解析上限…";
       break;
     }
 
