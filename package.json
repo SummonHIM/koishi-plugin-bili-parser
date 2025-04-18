@@ -1,7 +1,7 @@
 {
   "name": "@summonhim/koishi-plugin-bili-parser",
   "description": "A koishi plugin use to parse bilibili links.",
-  "version": "1.2.5",
+  "version": "1.2.6-rc.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -19,6 +19,14 @@
     "koishi",
     "plugin"
   ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.8",
+    "koishi": "^4.17.5",
+    "numbro": "^2.5.0"
+  },
   "peerDependencies": {
     "handlebars": "^4.7.8",
     "koishi": "^4.17.5",
@@ -26,7 +34,9 @@
   },
   "devDependencies": {
     "@types/handlebars": "^4.1.0",
-    "@types/numbro": "^1.9.3"
+    "@types/numbro": "^1.9.3",
+    "typescript": "^5.8.3",
+    "yml-register": "^1.2.5"
   },
   "koishi": {
     "description": {
