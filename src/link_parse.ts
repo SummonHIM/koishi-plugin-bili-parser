@@ -23,6 +23,43 @@ interface LinkType {
 }
 
 /**
+ * 将小程序 Json 替换为原始链接
+ * @param content 原文字符串
+ * @returns 替换后的字符串
+ */
+function parse_little_app(content: string): string {
+  // 正则匹配完整的 <json> 标签，包括 data 属性和结束符 />
+  const jsonRegex = /<json\s+data="([^"]+)"\s*\/?>/g;
+
+  // 使用 replace 方法直接替换原文
+  const replacedContent = content.replace(jsonRegex, (match, p1) => {
+    try {
+      // 解码 HTML 实体并解析 JSON 数据
+      const jsonData = JSON.parse(
+        p1
+          .replace(/&quot;/g, '"') // 替换 HTML 实体
+          .replace(/&amp;/g, "&")
+      );
+
+      // 检查是否包含符合条件的 appid
+      if (jsonData.meta?.detail_1?.appid === "1109937557") {
+        // 返回链接替换原来的 <json> 标签
+        return jsonData.meta.detail_1.qqdocurl || match;
+      }
+
+      // 如果条件不满足，保留原来的 <json> 标签
+      return match;
+    } catch (error) {
+      console.error("Failed to parse JSON:", error);
+      // 如果解析失败，保留原来的 <json> 标签
+      return match;
+    }
+  });
+
+  return replacedContent;
+}
+
+/**
  * 链接类型解析
  * @param content 传入消息
  * @param config 插件设置
@@ -126,10 +163,15 @@ function link_type_parser(content: string, config: Config): LinkType[] {
     );
   }
 
+  let sanitizedContent: string = content;
+  sanitizedContent = parse_little_app(sanitizedContent)
+  sanitizedContent = sanitizedContent.replace(/<[^>]+>/g, "");
+  logger.debug("Sanitized message: ", sanitizedContent);
+
   const results: LinkType[] = [];
 
   linkRegex.forEach(({ pattern, type }) => {
-    const matches = content.matchAll(pattern);
+    const matches = sanitizedContent.matchAll(pattern);
 
     for (const match of matches) {
       results.push({
