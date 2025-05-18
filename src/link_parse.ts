@@ -28,13 +28,11 @@ interface LinkType {
  * @returns 替换后的字符串
  */
 function parse_little_app(content: string): string {
-  // 正则匹配完整的 <json> 标签，包括 data 属性和结束符 />
   const jsonRegex = /<json\s+data="([^"]+)"\s*\/?>/g;
 
   // 使用 replace 方法直接替换原文
   const replacedContent = content.replace(jsonRegex, (match, p1) => {
     try {
-      // 解码 HTML 实体并解析 JSON 数据
       const jsonData = JSON.parse(
         p1
           .replace(/&quot;/g, '"') // 替换 HTML 实体
@@ -43,15 +41,12 @@ function parse_little_app(content: string): string {
 
       // 检查是否包含符合条件的 appid
       if (jsonData.meta?.detail_1?.appid === "1109937557") {
-        // 返回链接替换原来的 <json> 标签
         return jsonData.meta.detail_1.qqdocurl || match;
       }
 
-      // 如果条件不满足，保留原来的 <json> 标签
       return match;
     } catch (error) {
-      console.error("Failed to parse JSON:", error);
-      // 如果解析失败，保留原来的 <json> 标签
+      logger.error("Failed to parse little app JSON:", error);
       return match;
     }
   });
@@ -68,13 +63,20 @@ function parse_little_app(content: string): string {
 function link_type_parser(content: string, config: Config): LinkType[] {
   const linkRegex: LinkRegex[] = [];
 
-  if (config.bVideoEnable)
+  if (config.bVideoEnable) {
     linkRegex.push({
       pattern: config.bVideoFullURL
-        ? /bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)/gim
-        : /([ab]v[0-9a-zA-Z]+)/gim,
+        ? /bilibili\.com\/video\/(?<![a-zA-Z0-9])[aA][vV]([0-9]+)/gim
+        : /((?<![a-zA-Z0-9])[aA][vV]([0-9]+))/gim,
       type: "Video",
     });
+    linkRegex.push({
+      pattern: config.bVideoFullURL
+        ? /bilibili\.com\/video\/(?<![a-zA-Z0-9])[bB][vV](1[0-9A-Za-z]+)/gim
+        : /((?<![a-zA-Z0-9])[bB][vV](1[0-9A-Za-z]+))/gim,
+      type: "Video",
+    });
+  }
 
   if (config.bLiveEnable)
     linkRegex.push({
@@ -164,7 +166,7 @@ function link_type_parser(content: string, config: Config): LinkType[] {
   }
 
   let sanitizedContent: string = content;
-  sanitizedContent = parse_little_app(sanitizedContent)
+  sanitizedContent = parse_little_app(sanitizedContent);
   sanitizedContent = sanitizedContent.replace(/<[^>]+>/g, "");
   logger.debug("Sanitized message: ", sanitizedContent);
 
