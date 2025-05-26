@@ -116,10 +116,10 @@ When regex match `bilibili\.com\/opus\/(\d+)`, reply
 当正则表达式符合 `bilibili\.com\/opus\/(\d+)`，回复
 
 ```
-{{modules.module_author.name}}的动态
-<img src=\"{{modules.module_dynamic.additional.goods.items.[0].cover}}\" />
-{{modules.module_dynamic.desc.text}}
-转发：{{formatNumber modules.module_stat.forward.count}} | 评论：{{formatNumber modules.module_stat.comment.count}} | 点赞：{{formatNumber modules.module_stat.like.count}}
+{{item.modules.module_author.name}}的动态
+<img src=\"{{item.modules.module_dynamic.additional.goods.items.[0].cover}}\" />
+{{item.modules.module_dynamic.desc.text}}
+转发：{{formatNumber item.modules.module_stat.forward.count}} | 评论：{{formatNumber item.modules.module_stat.comment.count}} | 点赞：{{formatNumber item.modules.module_stat.like.count}}
 ```
 
 ### Space/空间

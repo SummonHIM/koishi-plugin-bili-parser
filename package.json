@@ -33,14 +33,29 @@
     "numbro": "^2.5.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.27.0",
     "@types/handlebars": "^4.1.0",
     "@types/numbro": "^1.9.3",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "globals": "^16.1.0",
+    "prettier": "^3.5.3",
     "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.1",
     "yml-register": "^1.2.5"
   },
   "koishi": {
     "description": {
       "zh": "一个能够解析 BiliBili 链接的 Koishi 插件。"
+    },
+    "service": {
+      "required": [
+        "http"
+      ],
+      "optional": [
+        "puppeteer"
+      ]
     },
     "locales": [
       "zh"
