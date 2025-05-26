@@ -73,13 +73,13 @@ export function link_parser(content: string): Links[] {
   if (runtime.config.bVideoEnable) {
     linkRegex.push({
       pattern: runtime.config.bVideoFullURL
-        ? /bilibili\.com\/video\/(?<![a-zA-Z0-9])[aA][vV]([0-9]+)/gim
+        ? /bilibili\.com\/video\/((?<![a-zA-Z0-9])[aA][vV]([0-9]+))/gim
         : /((?<![a-zA-Z0-9])[aA][vV]([0-9]+))/gim,
       type: "Video",
     });
     linkRegex.push({
       pattern: runtime.config.bVideoFullURL
-        ? /bilibili\.com\/video\/(?<![a-zA-Z0-9])[bB][vV](1[0-9A-Za-z]+)/gim
+        ? /bilibili\.com\/video\/((?<![a-zA-Z0-9])[bB][vV](1[0-9A-Za-z]+))/gim
         : /((?<![a-zA-Z0-9])[bB][vV](1[0-9A-Za-z]+))/gim,
       type: "Video",
     });
