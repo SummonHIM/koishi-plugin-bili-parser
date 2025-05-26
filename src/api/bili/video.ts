@@ -99,7 +99,7 @@ export async function puppeteer_fetch_api(id: string) {
     await page.goto(`https://www.bilibili.com/video/${id}`, {
       waitUntil: "networkidle2",
     });
-    await page.goto(url, { waitUntil: "networkidle2" });
+    await page.goto(url, { waitUntil: "load" });
 
     ret = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);

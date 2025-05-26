@@ -57,12 +57,12 @@ export async function puppeteer_fetch_api(id: string) {
 
   let ret: BiliAPI<Dict>;
   try {
-    await page.goto("https://www.bilibili.com/404", {
+    await page.goto(`https://live.bilibili.com/${id}`, {
       waitUntil: "networkidle2",
     });
     await page.goto(
       `https://api.live.bilibili.com/room/v1/Room/get_info?room_id=${id}`,
-      { waitUntil: "networkidle2" },
+      { waitUntil: "load" },
     );
 
     ret = await page.evaluate(() => {

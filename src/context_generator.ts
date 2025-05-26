@@ -121,9 +121,9 @@ export async function generate_context(session: Session): Promise<string> {
     fetchApiMap = {
       Video: Api_Bili_Video.puppeteer_fetch_api,
       Live: Api_Bili_Live.puppeteer_fetch_api,
-      BangumiEp: Api_Bili_Bangumi.fetch_web_api,
-      BangumiSs: Api_Bili_Bangumi.fetch_web_api,
-      BangumiMd: Api_Bili_Bangumi.fetch_mdid_api,
+      BangumiEp: Api_Bili_Bangumi.puppeteer_fetch_web_api,
+      BangumiSs: Api_Bili_Bangumi.puppeteer_fetch_web_api,
+      BangumiMd: Api_Bili_Bangumi.puppeteer_fetch_mdid_api,
       Space: Api_Bili_Space.puppeteer_fetch_api,
       Opus: Api_Bili_Opus.puppeteer_fetch_api,
       Article: Api_Bili_Article.puppeteer_fetch_api,

@@ -43,7 +43,7 @@ export async function puppeteer_fetch_api(id: string) {
       waitUntil: "networkidle2",
     });
     await page.goto(`https://api.bilibili.com/x/article/viewinfo?id=${id}`, {
-      waitUntil: "networkidle2",
+      waitUntil: "load",
     });
 
     ret = await page.evaluate(() => {

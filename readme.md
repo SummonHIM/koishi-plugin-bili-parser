@@ -51,6 +51,7 @@ https://live.bilibili.com/{{room_id}}
 https://www.bilibili.com/bangumi/media/md{{media_id}}
 ```
 
+具体集
 ```
 {{season_title}}（{{rating.score}}分）
 <img src=\"{{getCurrentEpisode "cover"}}\" />
@@ -66,9 +67,9 @@ https://www.bilibili.com/bangumi/play/ep{{getCurrentEpisode "ep_id"}}
 当正则表达式符合 `space\.bilibili\.com\/(\d+)`，回复
 
 ```
-{{module_author.name}}
-<img src=\"{{module_author.face}}\" />
-https://space.bilibili.com/{{module_author.mid}}
+{{items.[0].modules.module_author.name}} 的个人空间
+<img src=\"{{items.[0].modules.module_author.face}}\" />
+https://space.bilibili.com/{{items.[0].modules.module_author.mid}}
 ```
 
 ### Opus/动态
@@ -76,9 +77,15 @@ https://space.bilibili.com/{{module_author.mid}}
 
 ```
 {{item.modules.module_author.name}}的动态
-<img src=\"{{item.modules.module_dynamic.additional.goods.items.[0].cover}}\" />
-{{item.modules.module_dynamic.desc.text}}
+<img src=\"{{item.modules.module_author.face}}\" />
+{{#if item.modules.module_dynamic.desc.text}}
+  {{item.modules.module_dynamic.desc.text}}
+{{else if item.modules.module_dynamic.major.article.title}}
+  {{item.modules.module_dynamic.major.article.title}}
+{{/if}}
+
 转发：{{formatNumber item.modules.module_stat.forward.count}} | 评论：{{formatNumber item.modules.module_stat.comment.count}} | 点赞：{{formatNumber item.modules.module_stat.like.count}}
+https://www.bilibili.com/opus/{{item.id_str}}
 ```
 
 ### Article/专栏
@@ -86,11 +93,11 @@ https://space.bilibili.com/{{module_author.mid}}
 
 ```
 {{title}}
-<img src=\"{{banner_url}}\" />
+<img src=\"{{image_urls.[0]}}\" />
 UP主：{{author_name}}
 点赞：{{formatNumber stats.like}}\t\t投币：{{formatNumber stats.coin}}
-观看：{{formatNumber stats.view}} | 收藏：{{formatNumber stats.favorite}} | 转发：{{formatNumber stats.share}}
-https://www.bilibili.com/read/{{getArticleID}}
+阅读：{{formatNumber stats.view}} | 收藏：{{formatNumber stats.favorite}} | 转发：{{formatNumber stats.share}}
+https://www.bilibili.com/read/cv{{getArticleID}}
 ```
 
 ### Audio/音乐
@@ -172,6 +179,8 @@ AA - BB
 有关更多占位符使用方法，请参阅 [Handlebars.js](https://handlebarsjs.com/)。
 
 ### Handlebars Helper 介绍
+如果你有相关的模板函数，欢迎向我们的仓库中 PR。
+
 #### 全局
 - formatNumber: 数字简化，例："formatNumber 1638" 会转换为 "1.6k"。
 - truncate: 字符串截断，例："truncate 啊啊啊啊啊啊啊啊啊啊啊 5" 会被省略为“啊啊啊啊啊啊…”。
@@ -184,3 +193,6 @@ AA - BB
 
 #### 直播
 - formatLiveStatus: 文字化当前直播状态。例："formatNumber online"。
+
+## 关于 Puppeteer
+目前 Puppeteer 是直接加载一遍正常网页来刷新 wbi 等 Cookie。这个办法虽笨又慢但却是个不错的解决方案。如果你有更快的方案欢迎发 Issue。

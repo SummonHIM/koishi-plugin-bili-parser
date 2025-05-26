@@ -44,7 +44,7 @@ export async function puppeteer_fetch_api(id: string) {
     });
     await page.goto(
       `https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=${id}`,
-      { waitUntil: "networkidle2" },
+      { waitUntil: "load" },
     );
 
     ret = await page.evaluate(() => {

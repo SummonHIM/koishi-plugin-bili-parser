@@ -62,7 +62,7 @@ export async function puppeteer_fetch_api(id: string) {
     });
     await page.goto(
       `https://www.bilibili.com/audio/music-service-c/web/song/info?sid=${id}`,
-      { waitUntil: "networkidle2" },
+      { waitUntil: "load" },
     );
 
     ret = await page.evaluate(() => {

@@ -69,7 +69,7 @@ export const Config: Schema<Config> = Schema.intersect([
     usePuppeteer: Schema.boolean()
       .default(false)
       .description(
-        "所有 API 请求使用 Puppeteer 完成 *（可避免遭到风控，延迟约4秒/链接。）*",
+        "所有 API 请求使用 Puppeteer 完成 *（可避免遭到风控，延迟约4秒/链接）*",
       ),
     userAgent: Schema.string()
       .default(
@@ -177,7 +177,7 @@ https://space.bilibili.com/{{items.[0].modules.module_author.mid}}`,
 {{/if}}
 
 转发：{{formatNumber item.modules.module_stat.forward.count}} | 评论：{{formatNumber item.modules.module_stat.comment.count}} | 点赞：{{formatNumber item.modules.module_stat.like.count}}
-https://www.bilibili.com/opus/{{id_str}}`,
+https://www.bilibili.com/opus/{{item.id_str}}`,
       )
       .role("textarea", { rows: [8, 4] })
       .description("返回的文本预设"),
