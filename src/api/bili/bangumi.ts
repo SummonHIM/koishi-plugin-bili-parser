@@ -1,6 +1,6 @@
 import { Dict } from "koishi";
 
-import { logger, runtime } from "../..";
+import { runtime } from "../..";
 import { BiliAPI } from ".";
 
 interface BGMType {
@@ -54,7 +54,6 @@ export async function fetch_web_api(id: string): Promise<BiliAPI<Dict>> {
       throw new Error(`No such bangumi type: ${bgm.type}`);
   }
 
-  logger.debug(url);
   const ret = await runtime.ctx.http.get<BiliAPI<Dict>>(url, {
     headers: {
       Host: "api.bilibili.com",

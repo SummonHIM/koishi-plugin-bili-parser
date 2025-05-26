@@ -116,18 +116,19 @@ export async function generate_context(session: Session): Promise<string> {
   // API 映射表
   let fetchApiMap: Record<string, (id: string) => Promise<BiliAPI<Dict>>>;
 
+  // 如果使用 Puppeteer
   if (runtime.config.usePuppeteer) {
     fetchApiMap = {
-      Video: Api_Bili_Video.fetch_api,
-      Live: Api_Bili_Live.fetch_api,
+      Video: Api_Bili_Video.puppeteer_fetch_api,
+      Live: Api_Bili_Live.puppeteer_fetch_api,
       BangumiEp: Api_Bili_Bangumi.fetch_web_api,
       BangumiSs: Api_Bili_Bangumi.fetch_web_api,
       BangumiMd: Api_Bili_Bangumi.fetch_mdid_api,
-      Space: Api_Bili_Space.fetch_api,
-      Opus: Api_Bili_Opus.fetch_api,
+      Space: Api_Bili_Space.puppeteer_fetch_api,
+      Opus: Api_Bili_Opus.puppeteer_fetch_api,
       Article: Api_Bili_Article.puppeteer_fetch_api,
-      Audio: Api_Bili_Audio.fetch_api,
-      AudioMenu: Api_Bili_Audio.fetch_am_api,
+      Audio: Api_Bili_Audio.puppeteer_fetch_api,
+      AudioMenu: Api_Bili_Audio.puppeteer_fetch_am_api,
     };
   } else {
     fetchApiMap = {

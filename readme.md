@@ -7,15 +7,13 @@ A koishi plugin use to parse bilibili links.
 
 一个能够解析 BiliBili 链接的 Koishi 插件。
 
-## Depends/前置依赖
+## 前置依赖
 
 - [handlebars](https://www.npmjs.com/package/handlebars)
 - [numbro](https://www.npmjs.com/package/numbro)
 
-## Usage/使用方法
+## 使用方法
 ### Video/视频
-When regex match `bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)`, reply
-
 当正则表达式符合 `bilibili\.com\/video\/([ab]v[0-9a-zA-Z]+)`，回复
 
 ```
@@ -30,8 +28,6 @@ https://www.bilibili.com/video/{{bvid}}
 ```
 
 ### Live/直播
-When regex match `live\.bilibili\.com(?:\/h5)?\/(\d+)`, reply
-
 当正则表达式符合 `live\.bilibili\.com(?:\/h5)?\/(\d+)`，回复
 
 ```
@@ -43,8 +39,6 @@ https://live.bilibili.com/{{room_id}}
 ```
 
 ### Bangumi/番剧
-When regex match `bilibili\.com\/bangumi\/play\/((ep|ss)(\d+))`, `bilibili\.com\/bangumi\/media\/(md(\d+))`, reply
-
 当正则表达式符合 `bilibili\.com\/bangumi\/play\/((ep|ss)(\d+))`，`bilibili\.com\/bangumi\/media\/(md(\d+))`，回复
 
 ```
@@ -68,9 +62,26 @@ https://www.bilibili.com/bangumi/media/md{{media_id}}
 https://www.bilibili.com/bangumi/play/ep{{getCurrentEpisode "ep_id"}}
 ```
 
-### Article/专栏
-When regex match `bilibili\.com\/read\/cv(\d+)`, `bilibili\.com\/read\/mobile(?:\?id=|\/)(\d+)`, reply
+### Space/空间
+当正则表达式符合 `space\.bilibili\.com\/(\d+)`，回复
 
+```
+{{module_author.name}}
+<img src=\"{{module_author.face}}\" />
+https://space.bilibili.com/{{module_author.mid}}
+```
+
+### Opus/动态
+当正则表达式符合 `bilibili\.com\/opus\/(\d+)`，回复
+
+```
+{{item.modules.module_author.name}}的动态
+<img src=\"{{item.modules.module_dynamic.additional.goods.items.[0].cover}}\" />
+{{item.modules.module_dynamic.desc.text}}
+转发：{{formatNumber item.modules.module_stat.forward.count}} | 评论：{{formatNumber item.modules.module_stat.comment.count}} | 点赞：{{formatNumber item.modules.module_stat.like.count}}
+```
+
+### Article/专栏
 当正则表达式符合 `bilibili\.com\/read\/cv(\d+)`，`bilibili\.com\/read\/mobile(?:\?id=|\/)(\d+)`，回复
 
 ```
@@ -83,8 +94,6 @@ https://www.bilibili.com/read/{{getArticleID}}
 ```
 
 ### Audio/音乐
-When regex match `bilibili\.com\/audio\/au(\d+)`, reply
-
 当正则表达式符合 `bilibili\.com\/audio\/au(\d+)`，回复
 
 ```
@@ -97,8 +106,6 @@ https://www.bilibili.com/audio/au{{id}}
 ```
 
 ### Audio Menu/歌单
-When regex match `bilibili\.com\/audio\/am(\d+)`, reply
-
 当正则表达式符合 `bilibili\.com\/audio\/am(\d+)`，回复
 
 ```
@@ -110,37 +117,10 @@ UP主：{{uname}}
 https://www.bilibili.com/audio/am{{menuId}}
 ```
 
-### Opus/动态
-When regex match `bilibili\.com\/opus\/(\d+)`, reply
-
-当正则表达式符合 `bilibili\.com\/opus\/(\d+)`，回复
-
-```
-{{item.modules.module_author.name}}的动态
-<img src=\"{{item.modules.module_dynamic.additional.goods.items.[0].cover}}\" />
-{{item.modules.module_dynamic.desc.text}}
-转发：{{formatNumber item.modules.module_stat.forward.count}} | 评论：{{formatNumber item.modules.module_stat.comment.count}} | 点赞：{{formatNumber item.modules.module_stat.like.count}}
-```
-
-### Space/空间
-When regex match `space\.bilibili\.com\/(\d+)`, reply
-
-当正则表达式符合 `space\.bilibili\.com\/(\d+)`，回复
-
-```
-{{module_author.name}}
-<img src=\"{{module_author.face}}\" />
-https://space.bilibili.com/{{module_author.mid}}
-```
-
 ### Short link/短链接
-When regex match `b23\.tv\/([0-9a-zA-Z]+)`, `bili(?:22|23|33)\.cn\/([0-9a-zA-Z]+)`, reply
-
 当正则表达式符合 `b23\.tv\/([0-9a-zA-Z]+)`，`bili(?:22|23|33)\.cn\/([0-9a-zA-Z]+)`，会先解析回原链接，之后会自动交给以上方法处理。
 
 ### Light App/小程序
-When regex match `https:\\\/\\\/b23.tv\\\/(.+)\?`, reply
-
 当正则表达式符合 `https:\\\/\\\/b23.tv\\\/(.+)\?`，会先解析回原链接，之后会自动交给以上方法处理。
 
 ## 自定义文本预设
@@ -159,7 +139,7 @@ logger:
 2. 发送一个视频链接给 Bot。此时日志会输出从 API 中获取来的 Json 数据。例：
 
 ```Json
-bVideo api return: {
+Video api return: {
     "name": "SummonHIM",
     "id": "11223344",
     "dict": {
@@ -172,6 +152,8 @@ bVideo api return: {
     ]
 }
 ```
+
+（推荐前去 [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect) 参阅更详细的 BiliBili API 介绍）
 
 3. 根据以上 Json 数据来编写自定义的文本预设占位符。
 

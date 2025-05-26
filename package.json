@@ -23,13 +23,17 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@koishijs/plugin-http": "^0.6.3",
     "handlebars": "^4.7.8",
     "koishi": "^4.17.5",
+    "koishi-plugin-puppeteer": "^3.9.0",
     "numbro": "^2.5.0"
   },
   "peerDependencies": {
+    "@koishijs/plugin-http": "^0.6.3",
     "handlebars": "^4.7.8",
     "koishi": "^4.17.5",
+    "koishi-plugin-puppeteer": "^3.9.0",
     "numbro": "^2.5.0"
   },
   "devDependencies": {

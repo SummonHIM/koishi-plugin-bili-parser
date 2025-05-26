@@ -1,6 +1,11 @@
 import { Links, logger, runtime } from ".";
-import { get_redir_url } from "./api/bili/short";
+import { get_redir_url, puppeteer_get_redir_url } from "./api/bili/short";
 
+/**
+ * 类型翻译器
+ * @param type 类型
+ * @returns 中文类型
+ */
 export function type_translator(type: string) {
   const typeMap: Record<string, string> = {
     Video: "视频",
@@ -208,7 +213,12 @@ export async function short_link_parser(links: Links[]): Promise<Links[]> {
 
   for (const link of links) {
     if (link.type === "Short") {
-      const redirUrl = await get_redir_url(link.id);
+      let redirUrl: string;
+      if (runtime.config.usePuppeteer) {
+        redirUrl = await puppeteer_get_redir_url(link.id);
+      } else {
+        redirUrl = await get_redir_url(link.id);
+      }
       if (redirUrl) {
         const resolvedLinks = link_parser(redirUrl);
         if (resolvedLinks.length > 0) {

@@ -68,12 +68,16 @@ export const Config: Schema<Config> = Schema.intersect([
       .description("自定义分隔符。*当出现多链接时使用的分隔符*"),
     usePuppeteer: Schema.boolean()
       .default(false)
-      .description("所有 API 请求使用 Puppeteer 完成"),
+      .description(
+        "所有 API 请求使用 Puppeteer 完成 *（可避免遭到风控，延迟约4秒/链接。）*",
+      ),
     userAgent: Schema.string()
       .default(
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       )
-      .description("所有 API 请求所用的 User-Agent"),
+      .description(
+        "所有 API 请求所用的 User-Agent *（为空时，Puppeteer 会使用默认UA）*",
+      ),
   }).description("基础设置"),
 
   Schema.object({
@@ -152,9 +156,9 @@ https://www.bilibili.com/bangumi/play/ep{{getCurrentEpisode "ep_id"}}`,
       .description("启用空间链接解析"),
     bSpaceRetPreset: Schema.string()
       .default(
-        `{{module_author.name}} 的个人空间
-<img src=\"{{module_author.face}}\" />
-https://space.bilibili.com/{{module_author.mid}}`,
+        `{{items.[0].modules.module_author.name}} 的个人空间
+<img src=\"{{items.[0].modules.module_author.face}}\" />
+https://space.bilibili.com/{{items.[0].modules.module_author.mid}}`,
       )
       .role("textarea", { rows: [8, 4] })
       .description("返回的文本预设"),

@@ -10,7 +10,7 @@ import { runtime } from "../..";
  */
 export async function fetch_api(id: string): Promise<BiliAPI<Dict>> {
   const ret: BiliAPI<Dict> = await runtime.ctx.http.get<BiliAPI<Dict>>(
-    `https://api.bilibili.com/x/article/viewinfo?id=${id.replace(/^cv/, "")}`,
+    `https://api.bilibili.com/x/article/viewinfo?id=${id}`,
     {
       headers: {
         Host: "api.bilibili.com",
@@ -21,6 +21,11 @@ export async function fetch_api(id: string): Promise<BiliAPI<Dict>> {
   return ret;
 }
 
+/**
+ * 使用 Puppeteer 获取专栏基本信息
+ * @param id 专栏 ID
+ * @returns API 内容
+ */
 export async function puppeteer_fetch_api(id: string) {
   if (!runtime.ctx.puppeteer)
     throw new Error("Please enable puppeteer service.");
@@ -34,13 +39,12 @@ export async function puppeteer_fetch_api(id: string) {
 
   let ret: BiliAPI<Dict>;
   try {
-    await page.goto("https://www.bilibili.com/404", {
+    await page.goto(`https://www.bilibili.com/read/cv${id}`, {
       waitUntil: "networkidle2",
     });
-    await page.goto(
-      `https://api.bilibili.com/x/article/viewinfo?id=${id.replace(/^cv/, "")}`,
-      { waitUntil: "networkidle2" },
-    );
+    await page.goto(`https://api.bilibili.com/x/article/viewinfo?id=${id}`, {
+      waitUntil: "networkidle2",
+    });
 
     ret = await page.evaluate(() => {
       return JSON.parse(document.body.innerText);
