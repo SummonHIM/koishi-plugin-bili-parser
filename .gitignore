@@ -16,3 +16,6 @@ tsconfig.tsbuildinfo
 *.ntvs*
 *.njsproj
 *.sln
+
+# syncthing临时文件
+@eaDir

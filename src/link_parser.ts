@@ -1,5 +1,27 @@
 import { Links, logger, runtime } from ".";
 import { get_redir_url, puppeteer_get_redir_url } from "./api/bili/short";
+import { normalizeVideoId } from "./bv_av_converter";
+
+/**
+ * 去重函数 (BV/AV号互转去重)
+ * @param links 链接数组
+ * @returns 去重后的链接数组
+ */
+function deduplicateLinks(links: Links[]): Links[] {
+  return links.filter((item, index, self) => {
+    // 对于视频类型，使用标准化id进行去重
+    if (item.type === "Video") {
+      const normalizedId = normalizeVideoId(item.id);
+      return index === self.findIndex((t) => 
+        t.type === item.type && normalizeVideoId(t.id) === normalizedId
+      );
+    }
+    // 其他类型使用原有去重逻辑
+    return index === self.findIndex((t) => 
+      t.type === item.type && t.id === item.id
+    );
+  });
+}
 
 /**
  * 类型翻译器
@@ -198,11 +220,8 @@ export function link_parser(content: string): Links[] {
     }
   });
 
-  // 去重链接数组
-  const unique = results.filter(
-    (item, index, self) =>
-      index === self.findIndex((t) => t.type === item.type && t.id === item.id),
-  );
+  // 去重
+  const unique = deduplicateLinks(results);
 
   logger.debug("Links: ", unique);
   return unique;
@@ -231,10 +250,7 @@ export async function short_link_parser(links: Links[]): Promise<Links[]> {
   }
 
   // 去重
-  const unique = result.filter(
-    (item, index, self) =>
-      index === self.findIndex((t) => t.type === item.type && t.id === item.id),
-  );
+  const unique = deduplicateLinks(result);
 
   return unique;
 }
